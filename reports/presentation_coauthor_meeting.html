@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Báo cáo Chiến lược Co-Author &amp; GVHD — Đánh giá Thực nghiệm Social Navigation</title>
+<style>
+  :root {
+    --bg-base: #0f141c;
+    --bg-card: #18202c;
+    --bg-card-subtle: #1e293b;
+    --border: #2a374a;
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-dark: #0284c7;
+    --ok: #34d399;
+    --ok-bg: rgba(52, 211, 153, 0.12);
+    --warn: #fbbf24;
+    --warn-bg: rgba(251, 191, 36, 0.12);
+    --bad: #f87171;
+    --bad-bg: rgba(248, 113, 113, 0.12);
+    --mono: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg-base);
+    color: var(--text-main);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.6;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOP BAR */
+  .top-bar {
+    height: 52px;
+    background: #090d14;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+  .top-bar .title-tag {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--text-main);
+  }
+  .badge-status {
+    background: rgba(56, 189, 248, 0.15);
+    color: var(--accent);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-family: var(--mono);
+  }
+
+  /* SLIDE VIEWPORT */
+  .deck-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 40px 60px;
+    display: none;
+    flex-direction: column;
+    overflow-y: auto;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  .slide.active {
+    display: flex;
+  }
+
+  /* TYPOGRAPHY */
+  .slide-header {
+    margin-bottom: 24px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 14px;
+  }
+  .slide-num {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 4px;
+  }
+  h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 16px 0 8px;
+  }
+  p {
+    font-size: 15px;
+    color: #cbd5e1;
+    margin-bottom: 14px;
+  }
+
+  /* GRIDS & CARDS */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .card.highlight {
+    border-color: var(--accent);
+    background: linear-gradient(145deg, #18202c, #1a2a3e);
+  }
+  .card.option-1 {
+    border-top: 4px solid var(--accent);
+  }
+  .card.option-2 {
+    border-top: 4px solid var(--ok);
+  }
+  .card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .card-desc {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    flex: 1;
+  }
+
+  /* STAT CALLOUTS */
+  .stat-box {
+    background: var(--bg-card-subtle);
+    border-radius: 6px;
+    padding: 14px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .stat-val {
+    font-family: var(--mono);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .stat-val.bad { color: var(--bad); }
+  .stat-val.ok { color: var(--ok); }
+  .stat-val.warn { color: var(--warn); }
+  .stat-lbl {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  /* TABLES */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 14px 0;
+    background: var(--bg-card);
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  th {
+    background: #111722;
+    color: #cbd5e1;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    color: #e2e8f0;
+  }
+  tr:last-child td { border-bottom: none; }
+  .mono { font-family: var(--mono); }
+
+  /* CALLOUT BLOCKS */
+  .callout {
+    padding: 14px 18px;
+    border-radius: 6px;
+    margin: 12px 0;
+    font-size: 13.5px;
+    border-left: 4px solid var(--accent);
+    background: rgba(56, 189, 248, 0.08);
+  }
+  .callout.warn {
+    border-left-color: var(--warn);
+    background: var(--warn-bg);
+  }
+  .callout.bad {
+    border-left-color: var(--bad);
+    background: var(--bad-bg);
+  }
+  .callout.ok {
+    border-left-color: var(--ok);
+    background: var(--ok-bg);
+  }
+  .callout b { color: #fff; }
+
+  /* EVIDENCE CHIPS */
+  .chip-row { display: flex; flex-wrap: wrap; gap: 7px; margin: 10px 0 6px; }
+  .chip {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    padding: 4px 9px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #111722;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .chip b { color: #fff; font-weight: 700; }
+  .chip.accent { border-color: rgba(56,189,248,0.45); color: var(--accent); }
+  .chip.ok { border-color: rgba(52,211,153,0.45); color: var(--ok); }
+  .chip.bad { border-color: rgba(248,113,113,0.45); color: var(--bad); }
+  .chip.warn { border-color: rgba(251,191,36,0.45); color: var(--warn); }
+
+  /* COMPACT BAR ROWS (geometry cost) */
+  .bar-row {
+    display: grid;
+    grid-template-columns: 104px 1fr 130px;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+  .bar-lbl { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+  .bar-track {
+    height: 10px;
+    background: #111722;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .bar-fill { height: 100%; border-radius: 999px; }
+  .bar-fill.base { background: var(--accent); }
+  .bar-fill.cost { background: var(--warn); }
+  .bar-val { font-family: var(--mono); font-size: 12px; color: #e2e8f0; text-align: right; }
+
+  .mini-head {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin: 16px 0 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding-bottom: 5px;
+  }
+  .tbl-note { font-size: 11.5px; color: var(--text-muted); line-height: 1.55; margin-top: 4px; }
+  td.num, th.num { text-align: right; font-family: var(--mono); }
+  .src-line {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+    margin-top: 10px;
+  }
+
+  /* FOOTER & NAVIGATION CONTROLS */
+  .nav-bar {
+    height: 58px;
+    background: #090d14;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+  }
+  .progress-wrap {
+    flex: 1;
+    max-width: 400px;
+    margin: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 10%;
+    transition: width 0.3s ease;
+  }
+  .btn-nav {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-main);
+    padding: 7px 16px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s;
+  }
+  .btn-nav:hover:not(:disabled) {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+  .btn-nav:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+  .key-hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-family: var(--mono);
+  }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+  <div class="title-tag">
+    <span>HỌP CHIẾN LƯỢC CO-AUTHOR &amp; GVHD</span>
+    <span class="badge-status">QUY TRÌNH KIỂM ĐỊNH THỰC NGHIỆM</span>
+  </div>
+  <div class="key-hint">Dùng phím [←] và [→] hoặc [Space] để chuyển Slide</div>
+</div>
+
+<!-- SLIDE VIEWPORT -->
+<div class="deck-container">
+
+  <!-- SLIDE 1: INTRO -->
+  <div class="slide active" id="slide-1">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 01 / 11 · TỔNG QUAN HỌP CO-AUTH</div>
+      <h2>Đánh giá Thực nghiệm &amp; Quyết định Chiến lược: Diffusion / Flow Matching cho Social Navigation</h2>
+    </div>
+    <p style="font-size:16px; color:#cbd5e1; max-width:900px;">
+      Báo cáo chuỗi thực nghiệm đến Script 48, kiểm toán trên 1.900 trạng thái CityWalker + Penn-Fudan, 
+      đối chiếu SocialNav gốc, phát hiện held-out đảo dấu và định lượng baseline repair cùng chi phí hình học. <strong>2 hướng chiến lược</strong> 
+      được đặt lên bàn với ranh giới bằng chứng và bước kiểm chứng tiếp theo rõ ràng.
+    </p>
+
+    <div class="grid-4" style="margin-top:20px;">
+      <div class="stat-box">
+        <div class="stat-val">→ 48</div>
+        <div class="stat-lbl">Chuỗi script, gồm 47b diversity audit</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val">1.900</div>
+        <div class="stat-lbl">Trạng thái open-loop test</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val ok">100%</div>
+        <div class="stat-lbl">Số liệu đối chiếu có file log</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val warn">2 Hướng</div>
+        <div class="stat-lbl">Quyết định: Đi tiếp hoặc Pivot</div>
+      </div>
+    </div>
+
+    <div class="card highlight" style="margin-top:24px;">
+      <div class="card-title">Mục tiêu của buổi làm việc hôm nay</div>
+      <ul style="padding-left: 20px; font-size: 14px; color: #cbd5e1;">
+        <li><strong>Báo cáo trung thực:</strong> Trình bày khối lượng công việc đồ sộ đã làm nhưng không thổi phồng kết quả.</li>
+        <li><strong>Chỉ rõ vấn đề kỹ thuật:</strong> Vì sao trên tập in-sample giảm tiếp xúc (53.4% → 25.3%) nhưng held-out lại đảo dấu (+1.2 pp).</li>
+        <li><strong>Thống nhất bước kế tiếp:</strong> benchmark mục tiêu feasibility/comfort/yield so với baseline <code>guided_rr</code>; nếu đạt mới sang chuyển động thật / closed-loop. Nếu không đạt, ưu tiên Diagnostic Audit với phần lớn log đã sẵn có — chưa cam kết mức hoàn thiện hay khả năng accept.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- SLIDE 2: WORK DONE -->
+  <div class="slide" id="slide-2">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 02 / 11 · KHỐI LƯỢNG ĐÃ THỰC HIỆN</div>
+      <h2>Đã làm những gì? Kiểm toán toàn diện từ Open-Loop đến Cơ chế Rủi ro</h2>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">1. Tái lập &amp; Chẩn đoán SocialNav</div>
+        <ul style="padding-left:18px; font-size:13.5px; color:#cbd5e1; gap:6px; display:flex; flex-direction:column;">
+          <li>Tái tạo thành công open-loop CityWalker: MAOE đạt 9.2° (so với 7.8° trong paper gốc).</li>
+          <li>Thử nghiệm 4 phiên bản checkpoint: <code>published</code>, <code>il3_s0</code>, <code>il3_s1</code>, <code>il3_s2</code>.</li>
+          <li>Xây dựng tập test tiêu chuẩn 1.900 trạng thái kết hợp Penn-Fudan sprites (306 người, 5 điều kiện).</li>
+          <li>Phát hiện hiện tượng <strong>"thấy người nhưng không tránh"</strong> trên CityWalker.</li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <div class="card-title">2. Xây dựng &amp; Kiểm toán Risk Layer</div>
+        <ul style="padding-left:18px; font-size:13.5px; color:#cbd5e1; gap:6px; display:flex; flex-direction:column;">
+          <li>Phát triển cơ chế Gradient Guidance (Script 41) giúp kéo giảm proxy tiếp xúc từ 66.5% xuống 14.8%.</li>
+          <li>Xây dựng baseline Rerank-16 (Script 43) để đo xem việc chọn mẫu có vượt trội chọn ngẫu nhiên không.</li>
+          <li>Thiết kế bộ đánh giá Uncertainty Planning (Script 44) với Expected Risk và CVaR (alpha=0.5).</li>
+          <li>Xây dựng hạ tầng đánh giá Held-out nghiêm ngặt (Script 46) với 40 futures và paired cluster bootstrap.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:18px; border-left:4px solid var(--warn);">
+      <div class="card-title">3. Lớp kiểm toán bổ sung sau Script 46: Hình học &amp; Sửa baseline (Script 47 / 47b / 48)</div>
+      <div class="grid-2" style="gap:22px; align-items:start;">
+        <div>
+          <div class="mini-head">Đã làm</div>
+          <ul style="padding-left:18px; font-size:13px; color:#cbd5e1; display:flex; flex-direction:column; gap:7px;">
+            <li><code>47</code>: tool debug để soi phân bố mẫu sinh. <strong>Là công cụ gỡ lỗi, không phải bằng chứng thực nghiệm.</strong></li>
+            <li><code>47b</code>: kiểm tra đa dạng theo schema-2 — <strong>không có mode collapse</strong>. Lưu ý: ADE ở đây là <strong>đa dạng cặp giữa các candidate</strong>, <strong>không phải</strong> độ chính xác dự báo.</li>
+            <li><code>48</code>: chạy lại toàn bộ phép so sánh với baseline đã sửa (baseline repair) trên 306 sprites / 19 windows / 380 trạng thái head-on.</li>
+          </ul>
+          <div class="callout bad" style="font-size:12.5px; margin-top:10px;">
+            <b>Ranh giới công bố:</b> <code>48</code> là <strong>sửa baseline</strong> — không phải phương pháp mới, và <strong>không</strong> phải kết quả vượt SocNav. Mọi con số 4.3–4.7% bên dưới phải được đọc trong ranh giới này.
+          </div>
+        </div>
+        <div>
+          <div class="mini-head">Tiếp xúc trung bình 48 · il3_s0 (%, state × 32 futures)</div>
+          <div class="chip-row">
+            <span class="chip warn">ung <b>53.4</b></span>
+            <span class="chip accent">pt <b>29.1</b></span>
+            <span class="chip bad">exp <b>30.3</b></span>
+            <span class="chip bad">cvar <b>31.7</b></span>
+            <span class="chip accent">gui <b>27.2</b></span>
+            <span class="chip ok">grr_pt <b>4.3</b></span>
+            <span class="chip ok">grr_exp <b>4.7</b></span>
+            <span class="chip ok">grr_cvar <b>3.6</b></span>
+          </div>
+          <div class="tbl-note" style="margin-bottom:10px;">
+            Chỉ số <code>hel</code> là <strong>tiếp xúc trung bình trên state × 32 tương lai</strong>, <strong>không</strong> phải tỉ lệ trạng thái có tiếp xúc với bất kỳ tương lai nào trong 32. Tỉ lệ "không tiếp xúc ở cả 32" là phép đo riêng: <strong>49.7%</strong>.
+          </div>
+          <div class="tbl-note" style="margin-bottom:10px;">
+            <code>published</code>: <code>grr_exp</code> 47.1% so với <code>exp</code> 66.1% — sửa baseline chỉ cải thiện được một phần, không đảo ngược xu hướng trên checkpoint này.
+          </div>
+          <div class="mini-head">Chi phí hình học của đường cắt tiếp xúc</div>
+          <div class="bar-row"><span class="bar-lbl">lateral / exp</span><div class="bar-track"><div class="bar-fill base" style="width:44%"></div></div><span class="bar-val">0.66 m</span></div>
+          <div class="bar-row"><span class="bar-lbl">lateral / grr_exp</span><div class="bar-track"><div class="bar-fill cost" style="width:90%"></div></div><span class="bar-val">1.36 m</span></div>
+          <div class="bar-row"><span class="bar-lbl">&gt;1 m / exp</span><div class="bar-track"><div class="bar-fill base" style="width:10.8%"></div></div><span class="bar-val">10.8%</span></div>
+          <div class="bar-row"><span class="bar-lbl">&gt;1 m / grr_exp</span><div class="bar-track"><div class="bar-fill cost" style="width:91.6%"></div></div><span class="bar-val">91.6%</span></div>
+          <div class="bar-row"><span class="bar-lbl">turn / exp</span><div class="bar-track"><div class="bar-fill base" style="width:47%"></div></div><span class="bar-val">18.8°</span></div>
+          <div class="bar-row"><span class="bar-lbl">turn / grr_exp</span><div class="bar-track"><div class="bar-fill cost" style="width:85%"></div></div><span class="bar-val">34°</span></div>
+        </div>
+      </div>
+      <div class="src-line">Nguồn: Script 43 · 46 · 48 — log files đối chiếu. Không thay đổi GPU, không thay đổi dữ liệu trong suốt quá trình này.</div>
+    </div>
+
+    <div class="callout ok" style="margin-top:18px;">
+      <b>Khẳng định tư thế làm việc:</b> Chúng ta không phải chỉ dừng ở mức chạy demo vài video hay cào mã nguồn về xem. Toàn bộ chuỗi thực nghiệm từ 01 đến 46, sau đó mở rộng sang 47 / 47b / 48, được ghi nhật ký đầy đủ (log files), kiểm tra tính khả thi hình học, đo đạc góc quay, độ lệch ngang và khoảng tin cậy 95%. Phần mở rộng 48 được chạy bằng CPU trên dữ liệu sẵn có — không cần GPU, không sinh dữ liệu mới.
+    </div>
+  </div>
+
+  <!-- SLIDE 3: SOCIALNAV COMPARISON -->
+  <div class="slide" id="slide-3">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 03 / 11 · ĐỐI CHIẾU SOCIALNAV GỐC</div>
+      <h2>Phân tích Bản chất SocialNav: Mục tiêu Kỳ vọng vs. Rủi ro Đuôi</h2>
+    </div>
+    
+    <div class="grid-2">
+      <div class="card" style="border-left: 4px solid var(--accent);">
+        <div class="card-title">Kiến trúc SocialNav gốc (arXiv 2511.21135)</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">
+          Brain: Qwen2.5-VL-3B (sinh polygon, CoT) → Action Expert: Conditional Flow Matching (DiT 12 lớp, chunk 5) → Tinh chỉnh SAFE-GRPO (biến ODE thành SDE).
+        </p>
+        <div class="callout ok" style="margin:6px 0;">
+          <b>Khoảng trống nghiên cứu cần kiểm chứng:</b><br>
+          Trong mô tả SocialNav đã đối chiếu, chưa thấy một lớp biểu diễn tường minh phân phối tương lai người và tối ưu CVaR trên phân phối đó. Đây là một hướng kiểm chứng, <strong>không</strong> chứng minh kiến trúc gốc không thể học rủi ro hay rằng lớp mới sẽ cải thiện an toàn.
+        </div>
+      </div>
+
+      <div class="card" style="border-left: 4px solid var(--bad);">
+        <div class="card-title">Ba tuyên bố "Novelty" Tuyệt đối KHÔNG DÙNG</div>
+        <ul style="padding-left:18px; font-size:13px; color:#cbd5e1; display:flex; flex-direction:column; gap:8px;">
+          <li><strong style="color:var(--bad);">"Động vs. Tĩnh":</strong> Sai. Benchmark của họ spawn tới 6 người/100m, tốc độ 1.0 m/s ± 0.2. Người của họ có chuyển động.</li>
+          <li><strong style="color:var(--bad);">"Xác suất vs. Tất định":</strong> Sai. Action model Flow Matching + SAFE-GRPO của họ vốn đã là mô hình ngẫu nhiên sinh phân phối.</li>
+          <li><strong style="color:var(--bad);">"Generative vs. Nongenerative":</strong> Sai. Cả hai hệ thống đều là generative (Flow Matching / Diffusion).</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout warn" style="margin-top:16px;">
+      <b>Lưu ý cho Co-Author:</b> Không dùng đối lập "họ tĩnh, ta động". <strong>Lớp rủi ro tường minh trên phân phối người (Explicit Human-Risk Layer)</strong> là giả thuyết đóng góp cần so sánh với guided-rerank và nghiên cứu liên quan; novelty và lợi ích thực nghiệm chưa được xác lập.
+    </div>
+  </div>
+
+  <!-- SLIDE 4: THE HELD-OUT REVERSAL -->
+  <div class="slide" id="slide-4">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 04 / 11 · SỰ THẬT THỰC NGHIỆM</div>
+      <h2>Phát hiện Quyết định: Kết quả Held-out (Script 46) Đảo dấu, và Script 48 Xác nhận</h2>
+    </div>
+
+    <p style="font-size:14px;">
+      Ở Script 44, đánh giá in-sample cho thấy Expected Risk giảm tiếp xúc xuống <strong>25.3%</strong> (so với 28.9% của Point). Nhưng Script 46 — với <strong>32 tương lai held-out chưa từng dùng để chọn</strong> — đảo dấu toàn bộ. Script 48 sau đó chạy lại phép so sánh trên baseline đã sửa, với <strong>306 sprites / 19 windows / 380 trạng thái head-on</strong>.
+    </p>
+
+    <div class="grid-2" style="align-items:start;">
+      <div>
+        <div class="mini-head">A · Held-out 46 (32 tương lai tổng hợp) — il3_s0</div>
+        <table style="margin-top:0;">
+          <thead>
+            <tr>
+              <th>Arm</th>
+              <th>In-sample (44)</th>
+              <th>Held-out (46) [95% CI]</th>
+              <th>Δ vs pt</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>pt</code> (Point)</td>
+              <td>28.9%</td>
+              <td>29.1% [27.2, 31.1]</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td><code>exp</code> (Expected)</td>
+              <td style="color:var(--ok);">25.3%</td>
+              <td style="color:var(--bad); font-weight:700;">30.3% [28.3, 32.3]</td>
+              <td style="color:var(--bad);">+1.2 pp [+0.5, +1.9]</td>
+            </tr>
+            <tr>
+              <td><code>cvar</code> (Worst 50%)</td>
+              <td>—</td>
+              <td style="color:var(--bad); font-weight:700;">31.7% [29.8, 33.6]</td>
+              <td style="color:var(--bad);">+2.6 pp [+1.7, +3.5]</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout bad" style="font-size:12.5px;">
+          <b>Đảo dấu có ý nghĩa thống kê:</b> tối ưu trên 8 tương lai tổng hợp là overfit một nhóm mẫu hẹp. Robot né hướng này thì rơi vào vùng cắt của hướng khác; Point trung tính hơn nên ít bị phạt.
+        </div>
+      </div>
+
+      <div>
+        <div class="mini-head">B · Script 48 — toàn bộ arm, baseline đã sửa</div>
+        <table style="margin-top:0;">
+          <thead>
+            <tr>
+              <th>Arm (48)</th>
+              <th class="num">hel %</th>
+              <th>Đọc đúng</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>pt</code></td><td class="num">29.1</td><td>mốc so sánh</td></tr>
+            <tr><td><code>exp</code></td><td class="num" style="color:var(--bad);">30.3</td><td>tệ hơn pt — lặp lại đảo dấu của 46</td></tr>
+            <tr><td><code>cvar</code></td><td class="num" style="color:var(--bad);">31.7</td><td>tệ nhất trong nhóm forecast</td></tr>
+            <tr><td><code>gui</code></td><td class="num">27.2</td><td>guidance có điều kiện người, không oracle</td></tr>
+            <tr><td><code>grr_pt</code></td><td class="num" style="color:var(--ok);">4.3</td><td>sửa baseline</td></tr>
+            <tr><td><code>grr_exp</code></td><td class="num" style="color:var(--ok); font-weight:700;">4.7</td><td>sửa baseline + forecast exp</td></tr>
+            <tr><td><code>grr_cvar</code></td><td class="num" style="color:var(--ok);">3.6</td><td>sửa baseline + forecast cvar</td></tr>
+          </tbody>
+        </table>
+        <div class="callout ok" style="font-size:12.5px;">
+          <b>Kết quả chính (48):</b> <code>grr_exp − exp = −25.58 pp</code>, CI <code>[−27.30, −23.90]</code>.
+          Đây là <strong>chênh lệch của một baseline đã sửa</strong>, không phải một phương pháp mới. <code>published</code> chỉ đạt <code>grr_exp</code> 47.1% so với <code>exp</code> 66.1%.
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:6px;">
+      <div class="callout warn" style="font-size:12.5px;">
+        <b>Lỗ hổng tập dữ liệu (G10) — vẫn còn:</b> trong <code>states_pf.json</code>, chỉ <code>headon_3m</code> có vận tốc (0, −1); 4 điều kiện còn lại có vận tốc = 0, khiến bộ sinh tương lai tạo ra các tương lai gần trùng khít. Vì vậy 32 tương lai của 46 <strong>không phải 32 cảnh độc lập</strong>.
+      </div>
+      <div class="callout bad" style="font-size:12.5px;">
+        <b>Ba điều tuyệt đối không được suy ra từ bảng B:</b> (1) không phải phương pháp mới; (2) không phải "vượt SocNav"; (3) không phải bằng chứng an toàn xã hội. Muốn phát biểu nào trong ba điều đó, cần benchmark mục tiêu feasibility/yield trên chuyển động thật.
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 5: RERANK BASELINE LIMITS -->
+  <div class="slide" id="slide-5">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 05 / 11 · KIỂM CHỨNG NGÂN SÁCH MẪU</div>
+      <h2>Script 43 &amp; 48: Giới hạn của Reranking và Cái giá Hình học</h2>
+    </div>
+
+    <div class="grid-2" style="align-items:start;">
+      <div>
+        <p style="font-size:13.5px;">
+          Để xem "sinh 16 mẫu rồi chọn" là do phân phối hay chỉ vì lấy nhiều mẫu (Best-of-16), Script 43 kiểm tra toàn bộ 1.900 trạng thái:
+        </p>
+        <table style="margin-top:6px;">
+          <thead>
+            <tr>
+              <th>Policy / Điều kiện</th>
+              <th>Unguided</th>
+              <th>Best-of-16</th>
+              <th>Guided (rr16g)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>il3_s0</code> Headon</td>
+              <td>66.5%</td>
+              <td>35.5%</td>
+              <td style="color:var(--ok);font-weight:700;">0.0%*</td>
+            </tr>
+            <tr>
+              <td><code>published</code> Headon</td>
+              <td>100.0%</td>
+              <td>100.0%</td>
+              <td style="color:var(--bad);font-weight:700;">71.6%</td>
+            </tr>
+            <tr>
+              <td><code>published</code> Static 2m</td>
+              <td>95.1%</td>
+              <td>84.5%</td>
+              <td style="color:var(--warn);font-weight:700;">50.0%</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout warn" style="font-size:12.5px;">
+          <b>* 0.0% là oracle-advantaged, phải nói rõ mỗi lần trích dẫn:</b> guidance được trao <i>đúng</i> tương lai danh định rồi chọn mẫu tốt nhất. Không có forecaster nào tái lập được điều kiện này trong thực tế, nên 0.0% <strong>không</strong> phải "headroom khả dụng" và <strong>không</strong> được dùng làm mốc so sánh cho phương pháp.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Cái giá hình học — đo bằng Script 48</div>
+        <p style="font-size:12.5px; color:var(--text-muted); margin-bottom:8px;">
+          Đường cắt tiếp xúc không miễn phí. So sánh <code>exp</code> → <code>grr_exp</code> trên cùng bộ 380 trạng thái head-on:
+        </p>
+        <div class="bar-row"><span class="bar-lbl">lateral</span><div class="bar-track"><div class="bar-fill base" style="width:44%"></div></div><span class="bar-val">0.66 → 1.36 m</span></div>
+        <div class="bar-row"><span class="bar-lbl">tỉ lệ &gt;1 m</span><div class="bar-track"><div class="bar-fill cost" style="width:91.6%"></div></div><span class="bar-val">10.8 → 91.6%</span></div>
+        <div class="bar-row"><span class="bar-lbl">góc quay</span><div class="bar-track"><div class="bar-fill cost" style="width:85%"></div></div><span class="bar-val">18.8 → 34°</span></div>
+        <div class="tbl-note">
+          Tham chiếu lateral của metric là <strong>pool-mean reference</strong>, không phải mép hành lang; nó khác objective dùng <strong>tham chiếu riêng của từng candidate</strong>. 91.6% phương án lệch &gt;1 m là tín hiệu thay đổi hình học cần kiểm tra, <strong>không</strong> phải bằng chứng vi phạm hành lang.
+        </div>
+        <div class="callout bad" style="font-size:12.5px; margin-top:10px;">
+          <b>Kỷ luật đọc số:</b> metric lateral dùng pool-mean reference, còn objective dùng tham chiếu riêng của từng candidate; hai định nghĩa <strong>không đồng nhất</strong>. Tỉ lệ endpoint cũng <strong>không</strong> phải tiến độ (progress). Không được tráo các khái niệm này khi viết bài.
+        </div>
+        <div class="src-line">Script 48 · <code>il3_s0</code> · 306 sprites / 19 windows / 380 head-on states</div>
+      </div>
+    </div>
+
+    <div class="grid-3" style="margin-top:14px;">
+      <div class="card" style="padding:14px;">
+        <div class="card-title" style="font-size:13.5px;">47 — công cụ, không phải bằng chứng</div>
+        <p class="card-desc" style="font-size:12.5px;">Script 47 chỉ để soi phân bố mẫu sinh trong lúc gỡ lỗi. Không trích dẫn như kết quả thực nghiệm.</p>
+      </div>
+      <div class="card" style="padding:14px;">
+        <div class="card-title" style="font-size:13.5px;">47b — schema-2, không collapse</div>
+        <p class="card-desc" style="font-size:12.5px;">Kiểm tra đa dạng theo schema-2 cho thấy các mode vẫn hiện diện: <strong>không có mode collapse</strong>. ADE ở đây là đa dạng cặp giữa candidate, không phải độ chính xác dự báo.</p>
+      </div>
+      <div class="card" style="padding:14px;">
+        <div class="card-title" style="font-size:13.5px;">Rerank không tạo quỹ đạo mới</div>
+        <p class="card-desc" style="font-size:12.5px;">Rerank chỉ chọn trong 16 mẫu có sẵn. Trên <code>published</code> không guidance, cả 16 mẫu đều đi thẳng vào người nên rerank thường bất lực (100% → 100%, script 43). Chỉ khi thêm guidance vào quá trình sinh thì mới cắt được (<code>guided_rr_exp</code> 47.1% trên <code>published</code>). Đây là giới hạn của ngân sách mẫu, không phải bằng chứng cho mọi prior.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 6: DIAGNOSTIC DISCOVERY -->
+  <div class="slide" id="slide-6">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 06 / 11 · PHÁT HIỆN KHOA HỌC CÓ GIÁ TRỊ NHẤT</div>
+      <h2>"Seeing but Not Avoiding": Phát hiện Khiếm khuyết Hệ thống của SocialNav</h2>
+    </div>
+
+    <div class="card highlight" style="margin-bottom:16px;">
+      <div class="card-title" style="font-size:18px; color:var(--accent);">
+        Hiện tượng: Tỉ lệ tiếp xúc gần như KHÔNG ĐỔI dù có người hay không có người!
+      </div>
+      <p style="font-size:14px; margin-top:6px; color:#cbd5e1;">
+        Trên benchmark CityWalker, checkpoint gốc của SocialNav (huấn luyện bằng hàng chục nghìn giờ dữ liệu) cho tỉ lệ tiếp xúc gần như không đổi giữa điều kiện có người và không có người:
+      </p>
+      <div class="grid-2" style="margin-top:10px;">
+        <div class="stat-box">
+          <div class="stat-val bad">93% vs. 92%</div>
+          <div class="stat-lbl">Tiếp xúc ở Static 2m (Có người: 93% · Không có người: 92%)</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-val bad">99.5% vs. 98%</div>
+          <div class="stat-lbl">Tiếp xúc ở Head-on 3m (Có người: 99.5% · Không có người: 98%)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid-2" style="align-items:start;">
+      <div class="card">
+        <div class="card-title">Tại sao lại xảy ra hiện tượng này?</div>
+        <p style="font-size:13px; color:var(--text-muted);">
+          Các phép so sánh hành vi cho thấy phản ứng tránh người yếu trong benchmark sprite này. Một giả thuyết là tín hiệu người bị lấn át bởi mục tiêu goal-reaching, nhưng <strong>chưa có can thiệp token hay ablation nhân quả</strong> chứng minh cơ chế đó. Script 47b không thấy mode collapse trong các candidate được kiểm tra; điều này không xác định duy nhất nguyên nhân ở khâu chọn mẫu hay kiến trúc.
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Định lượng lại bằng Script 48 (il3_s0)</div>
+        <div class="chip-row">
+          <span class="chip warn">unguided <b>53.4%</b></span>
+          <span class="chip accent">pt <b>29.1%</b></span>
+          <span class="chip bad">exp <b>30.3%</b></span>
+          <span class="chip bad">cvar <b>31.7%</b></span>
+          <span class="chip accent">gui <b>27.2%</b></span>
+        </div>
+        <div class="tbl-note" style="margin-bottom:8px;">
+          <code>hel</code> = tiếp xúc trung bình trên <strong>state × 32 tương lai</strong>; không phải tỉ lệ trạng thái va chạm ở bất kỳ tương lai nào. Tỉ lệ "không tiếp xúc ở cả 32" là phép đo riêng: 49.7%.
+        </div>
+        <p style="font-size:12.5px; color:var(--text-muted);">
+          Forecast tường minh (exp/cvar) <strong>không</strong> cải thiện so với point. Tín hiệu người chỉ có tác dụng khi đưa vào như điều kiện chọn mẫu (<code>gui</code> 27.2%), và chỉ cắt mạnh khi baseline được sửa (<code>grr_*</code> 3.6–4.7%).
+        </p>
+        <div class="src-line">306 sprites / 19 windows / 380 head-on states · 32 tương lai tổng hợp, không độc lập</div>
+      </div>
+    </div>
+
+    <div class="callout warn" style="margin-top:14px;">
+      <b>Kỷ luật diễn giải (bắt buộc khi viết bài):</b> metric lateral trong 48 đo theo <strong>pool-mean reference</strong>, khác objective dùng <strong>tham chiếu riêng của từng candidate</strong>; nó <strong>không</strong> phải bằng chứng vi phạm hành lang. Tỉ lệ endpoint <strong>không</strong> phải tiến độ. Và 32 tương lai tổng hợp <strong>không</strong> phải 32 cảnh độc lập — nên phát hiện này là chẩn đoán có định hướng, chưa phải kết luận nhân quả.
+    </div>
+  </div>
+
+  <!-- SLIDE 7: TWO STRATEGIC OPTIONS -->
+  <div class="slide" id="slide-7">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 07 / 11 · NGÃ RẼ CHIẾN LƯỢC</div>
+      <h2>Hai Hướng đi Đặt lên Bàn làm việc của Co-Author</h2>
+    </div>
+
+    <div class="grid-2" style="margin-top:10px;">
+      <!-- OPTION 1 -->
+      <div class="card option-1">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:10px;">
+          <div class="card-title" style="color:var(--accent); margin-bottom:0;">OPTION 1: TIẾP TỤC HƯỚNG METHOD</div>
+          <span class="badge-status" style="background:rgba(56,189,248,0.2); white-space:nowrap;">Headroom synthetic · Feasibility chưa</span>
+        </div>
+        <p style="font-size:13.5px; font-weight:600; color:#fff;">
+          Tiền đề đã đổi: headroom tiếp xúc đã được chứng minh ở mức tổng hợp, nhưng feasibility / comfort / yield trên chuyển động thật thì chưa.
+        </p>
+        <ul style="padding-left:18px; font-size:12.8px; color:#cbd5e1; display:flex; flex-direction:column; gap:8px; margin:10px 0;">
+          <li><strong>Đã có:</strong> <code>grr_exp</code> 4.7% so với <code>exp</code> 30.3% (−25.58 pp, CI [−27.30, −23.90]) trên 380 trạng thái head-on. Đây là headroom tiếp xúc <strong>trong môi trường tổng hợp</strong>.</li>
+          <li><strong>Chưa có:</strong> liệu mức cắt đó có giữ được khi ràng buộc feasibility/comfort/yield hay không — chi phí hình học (1.36 m lệch ngang, 34° quay) cho thấy rủi ro rất thực.</li>
+          <li><strong>Việc phải làm:</strong> benchmark mục tiêu feasibility/yield so với các baseline <code>guided_rr</code>, trước khi nghĩ tới forecaster mới hay DRL.</li>
+          <li><strong>Không được làm:</strong> dùng 4.7% để tuyên bố phương pháp mới hoặc an toàn xã hội.</li>
+        </ul>
+        <div class="callout warn" style="margin-top:auto; font-size:12.3px;">
+          <b>Phù hợp nếu:</b> Co-Author chấp nhận một bài theo hướng phương pháp <i>bị ràng buộc chặt</i> (constrained), với 2–3 tuần thực nghiệm và khả năng cao phải thu hẹp claim.
+        </div>
+      </div>
+
+      <!-- OPTION 2 -->
+      <div class="card option-2">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:10px;">
+          <div class="card-title" style="color:var(--ok); margin-bottom:0;">OPTION 2: PIVOT SANG DIAGNOSTIC PAPER</div>
+          <span class="badge-status" style="background:rgba(52,211,153,0.2); color:var(--ok); white-space:nowrap;">Rủi ro thấp · Phần lớn data đã có</span>
+        </div>
+        <p style="font-size:13.5px; font-weight:600; color:#fff;">
+          "Seeing but Not Avoiding: A Systematic Audit of Flow Matching in Social Navigation"
+        </p>
+        <ul style="padding-left:18px; font-size:12.8px; color:#cbd5e1; display:flex; flex-direction:column; gap:8px; margin:10px 0;">
+          <li>Chuyển chuỗi 43 / 46 / 47 / 47b / 48 thành một bài kiểm toán kiến trúc (Empirical Study).</li>
+          <li>Đã có 1.900 trạng thái, phân tích bão hòa checkpoint, bằng chứng decoupling giữa VLM và Action Expert, và phép đo chi phí hình học.</li>
+          <li>Phần lớn dữ liệu đã nằm trong log; phần còn thiếu là viết, chuẩn hóa định nghĩa metric và phản biện nội bộ — không phải chạy lại GPU.</li>
+          <li>Không cần render server closed-loop (vốn đang lỗi WSL <code>E_ACCESSDENIED</code>).</li>
+        </ul>
+        <div class="callout warn" style="margin-top:auto; font-size:12.3px;">
+          <b>Phù hợp nếu:</b> muốn chốt bài nhanh để nộp IROS/ICRA, không phụ thuộc rủi ro huấn luyện forecaster mới. <b>Giới hạn:</b> bài này không được claim phát hiện mới về an toàn xã hội, và phải khai báo rõ giới hạn của 32 tương lai tổng hợp.
+        </div>
+      </div>
+    </div>
+
+    <div class="src-line" style="text-align:center; margin-top:12px;">Nguồn số liệu cho cả hai hướng: Script 43 · 46 · 48</div>
+  </div>
+
+  <!-- SLIDE 8: OPTION 1 DEEP DIVE -->
+  <div class="slide" id="slide-8">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 08 / 11 · ĐIỀU KIỆN TIẾN TIẾP (OPTION 1)</div>
+      <h2>Nếu chọn Option 1: Kế hoạch Dữ liệu Thật &amp; 3 Cổng Kiểm tra</h2>
+    </div>
+
+    <p style="font-size:14px;">
+      Để không lặp lại sai lầm tốn thời gian, chúng ta không thu thập video tràn lan hay cào YouTube (không có track ID). Chúng ta dùng <strong>1 clip SDD (Stanford Drone)</strong> và chạy 3 phép đo chốt chặn trong <strong>3–5 ngày</strong> — nhưng phải đọc lại cả 3 cổng dưới ánh sáng của Script 48.
+    </p>
+
+    <div class="grid-3" style="margin-top:12px;">
+      <div class="card">
+        <div class="card-title" style="font-size:14.5px;">Cổng 1: Đa dạng Hướng</div>
+        <div class="stat-val" style="font-size:19px; margin:8px 0;">≥ 5°</div>
+        <p class="card-desc" style="font-size:12.5px;">
+          Độ lệch chuẩn góc đi của các track người tại t = 3s phải ≥ 5°. Nếu người chỉ đi thẳng một đường, bài toán thoái hóa về constant-velocity. <strong>Trạng thái: chưa đo trên dữ liệu thật.</strong>
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="font-size:14.5px;">Cổng 2: Baseline Beatable</div>
+        <div class="stat-val" style="font-size:19px; margin:8px 0;">Tỉ lệ &gt; 1.15</div>
+        <p class="card-desc" style="font-size:12.5px;">
+          Sai số ADE của vận tốc không đổi chia cho sai số của mô hình tuyến tính phải &gt; 1.15. Nếu quy luật đơn giản đã tối ưu, diffusion model là over-engineering. <strong>Trạng thái: chưa đo trên dữ liệu thật.</strong>
+        </p>
+      </div>
+
+      <div class="card highlight">
+        <div class="card-title" style="font-size:14.5px; color:var(--accent);">Cổng 3: Headroom Thật</div>
+        <div class="stat-val warn" style="font-size:19px; margin:8px 0;">Chưa đóng</div>
+        <p class="card-desc" style="font-size:12.5px;">
+          Phép đo ở 46 dùng <code>rr16g</code> — <strong>oracle-advantaged</strong>: guidance nhận đúng tương lai danh định. Vì vậy 0.0% không chứng minh headroom. Cổng 3 phải chạy trên <strong>mục tiêu feasibility/yield</strong> với dữ liệu thật, so với baseline <code>guided_rr</code>.
+        </p>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:14px; align-items:start;">
+      <div class="callout ok" style="margin:0; font-size:12.5px;">
+        <b>Đã biết sau 48:</b> headroom tiếp xúc tồn tại trong môi trường tổng hợp (4.7% so với 30.3%). Nhưng nó đi kèm chi phí hình học lớn: lệch ngang 0.66 → 1.36 m, tỉ lệ &gt;1 m từ 10.8% → 91.6%, góc quay 18.8° → 34°.
+      </div>
+      <div class="callout bad" style="margin:0; font-size:12.5px;">
+        <b>Còn thiếu để đóng cổng:</b> feasibility, comfort và yield đo bằng mục tiêu riêng — chưa có. Không có GPU mới, không sinh dữ liệu mới; chỉ nạp trạng thái SDD vào pipeline có sẵn.
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top:14px; font-size:12.5px;">
+      <b>Cam kết tiến độ:</b> Script 46 đã có sẵn pipeline held-out và paired cluster bootstrap; Script 48 đã có sẵn lớp so sánh baseline sửa. Chỉ cần nạp file trạng thái mới từ SDD, chuỗi chạy trong vài phút. Co-Author có câu trả lời dứt khoát trong 3 ngày mà không cần đầu tư phần cứng mới.
+    </div>
+  </div>
+
+  <!-- SLIDE 9: OPTION 2 DEEP DIVE -->
+  <div class="slide" id="slide-9">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 09 / 11 · KẾ HOẠCH DỰ PHÒNG (OPTION 2)</div>
+      <h2>Nếu chọn Option 2: Đề cương Bài báo Kiểm toán Chẩn đoán</h2>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Cấu trúc bài báo "Diagnostic Audit"</div>
+        <ol style="padding-left:18px; font-size:13px; color:#cbd5e1; display:flex; flex-direction:column; gap:8px;">
+          <li><strong>Introduction:</strong> Sự bùng nổ của VLM + Flow Matching trong Social Navigation và niềm tin mặc định về tính an toàn.</li>
+          <li><strong>Empirical Audit Framework:</strong> Phương pháp kiểm toán độc lập trên 1.900 trạng thái CityWalker + Penn-Fudan sprites.</li>
+          <li><strong>Finding 1 — Weak Behavioral Response:</strong> Phản ứng tránh người yếu trong benchmark sprite; decoupling giữa VLM và Action Expert là giả thuyết cần ablation, không phải cơ chế đã chứng minh.</li>
+          <li><strong>Finding 2 — Saturation &amp; Failure of Reranking:</strong> Script 43 cho thấy trên checkpoint <code>published</code>, chọn mẫu mù không cải thiện được tiếp xúc; hiệu ứng này gắn với checkpoint đó, chưa phải kết luận cho mọi prior.</li>
+          <li><strong>Finding 3 — In-Sample / Held-out Reversal:</strong> Script 46 ghi nhận đảo dấu trên bộ tương lai tổng hợp đang xét; tương thích với overfit tập chọn, không phải kết luận về mọi công bố trước đây.</li>
+          <li><strong>Guidelines for Future Architectures:</strong> Đề xuất nguyên tắc thiết kế cho thế hệ mô hình tiếp theo.</li>
+        </ol>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Lợi thế thực thi &amp; phần còn thiếu</div>
+        <ul style="padding-left:18px; font-size:13px; color:#cbd5e1; display:flex; flex-direction:column; gap:10px;">
+          <li><strong style="color:var(--ok);">Phần lớn số liệu đã có sẵn:</strong> Có log của các thực nghiệm chính. Vẫn cần chuẩn hóa metric, kiểm toán độ phụ thuộc của mẫu và kiểm tra độ bền của kết luận.</li>
+          <li><strong style="color:var(--accent);">Đóng góp có thể bảo vệ:</strong> một empirical audit có phạm vi rõ, kèm baseline repair và đánh đổi hình học. Cần literature review và phản biện nội bộ; chưa có cơ sở dự báo accept.</li>
+          <li><strong style="color:var(--warn);">Tránh được Blocker môi trường:</strong> Không cần chạy closed-loop trên simulator bị hỏng kết nối WSL.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 10: COMPARISON MATRIX -->
+  <div class="slide" id="slide-10">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 10 / 11 · MA TRẬN ĐÁNH ĐỔI</div>
+      <h2>So sánh Đánh đổi Trực diện giữa Hai Phương án</h2>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Tiêu chí Đánh giá</th>
+          <th style="color:var(--accent);">Option 1: Tiến tiếp, phương pháp bị ràng buộc</th>
+          <th style="color:var(--ok);">Option 2: Pivot sang Diagnostic Paper</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Bản chất đóng góp</strong></td>
+          <td>Phương pháp có ràng buộc (feasibility/yield), chưa phải phương pháp mới đã chứng minh</td>
+          <td>Empirical Study / System Audit (chẩn đoán lỗi hệ thống)</td>
+        </tr>
+        <tr>
+          <td><strong>Bằng chứng headroom tiếp xúc</strong></td>
+          <td style="color:var(--warn);">Đã có ở mức tổng hợp: <code>grr_exp</code> 4.7% vs <code>exp</code> 30.3% (−25.58 pp). Chưa có trên chuyển động thật.</td>
+          <td>Dùng làm đối tượng kiểm toán, không dùng làm claim cải tiến</td>
+        </tr>
+        <tr>
+          <td><strong>Chi phí hình học</strong></td>
+          <td style="color:var(--bad);">Chưa giải quyết: lệch ngang 0.66 → 1.36 m; &gt;1 m 10.8% → 91.6%; quay 18.8° → 34°</td>
+          <td>Trình bày như phát hiện, không phải khuyết điểm của bài</td>
+        </tr>
+        <tr>
+          <td><strong>Thời gian hoàn thành</strong></td>
+          <td>3–4 tuần (nếu qua 3 cổng SDD)</td>
+          <td><strong>1–2 tuần</strong> (chủ yếu viết, vì phần lớn data đã xong)</td>
+        </tr>
+        <tr>
+          <td><strong>Rủi ro kỹ thuật</strong></td>
+          <td style="color:var(--warn);">Trung bình – Cao: chưa rõ yield, comfort; forecaster có thể không vượt baseline <code>guided_rr</code></td>
+          <td style="color:var(--ok);"><strong>Thấp</strong> về kỹ thuật; rủi ro nằm ở phản biện phạm vi claim</td>
+        </tr>
+        <tr>
+          <td><strong>Phụ thuộc môi trường</strong></td>
+          <td>Cần giải quyết WSL closed-loop nếu muốn claim ngang SocialNav</td>
+          <td><strong>Độc lập</strong> với closed-loop simulator</td>
+        </tr>
+        <tr>
+          <td><strong>Địa chỉ nộp bài tiềm năng</strong></td>
+          <td>RA-L, IROS 2027, ICRA 2027</td>
+          <td>IROS 2027, CoRL (Workshop / Main track), IEEE Access</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="grid-2" style="align-items:start;">
+      <div class="callout ok" style="margin:0; font-size:12.5px;">
+        <b>GO — đi tiếp có điều kiện:</b> chỉ với hướng phương pháp <strong>bị ràng buộc</strong>. Điều kiện vào cổng: benchmark mục tiêu feasibility/yield so với baseline <code>guided_rr</code>; sau đó mới tới chuyển động thật và closed-loop. Không thay đổi GPU, không sinh dữ liệu mới.
+      </div>
+      <div class="callout bad" style="margin:0; font-size:12.5px;">
+        <b>NO GO — tuyệt đối không:</b> claim 4.7% là phương pháp mới; claim an toàn xã hội; claim vượt SocNav; dùng 0.0% của <code>rr16g</code> như headroom khả dụng (oracle-advantaged); hoặc nhảy sang DRL ngay bây giờ.
+      </div>
+    </div>
+
+    <div class="callout highlight" style="margin-top:12px; font-size:12.5px;">
+      <b>Khuyến nghị của người thực hiện trực tiếp:</b> Co-Author thống nhất <strong>bước kế tiếp duy nhất</strong> — benchmark mục tiêu feasibility/yield so với baseline <code>guided_rr</code>. Kết quả bước này quyết định: qua cổng thì mở đường chuyển động thật / closed-loop; không qua thì chốt 100% tài nguyên sang <strong>Option 2</strong>, nơi dữ liệu đã đủ để viết.
+    </div>
+  </div>
+
+  <!-- SLIDE 11: NEXT STEPS & ACTION PLAN -->
+  <div class="slide" id="slide-11">
+    <div class="slide-header">
+      <div class="slide-num">SLIDE 11 / 11 · KẾ HOẠCH HÀNH ĐỘNG TUẦN TỚI</div>
+      <h2>Bước kế tiếp Duy nhất &amp; Mốc Checkpoint với Co-Author</h2>
+    </div>
+
+    <div class="grid-3" style="margin-top:10px;">
+      <div class="card" style="border-top: 3px solid var(--accent);">
+        <div class="card-title">Bước 1 — Tuần này</div>
+        <div style="font-size:11.5px; color:var(--accent); font-weight:600; margin-bottom:6px; font-family:var(--mono);">FEASIBILITY / YIELD BENCHMARK</div>
+        <ul style="padding-left:16px; font-size:12.8px; color:#cbd5e1; display:flex; flex-direction:column; gap:6px;">
+          <li>Định nghĩa mục tiêu feasibility/yield tách khỏi metric tiếp xúc.</li>
+          <li>Chạy so sánh trực tiếp với các baseline <code>guided_rr</code> trên cùng bộ 380 trạng thái head-on.</li>
+          <li>Báo cáo kèm chi phí hình học (lateral, &gt;1 m, góc quay) — không báo riêng tiếp xúc.</li>
+          <li>Không thay đổi GPU, không sinh dữ liệu mới.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="border-top: 3px solid var(--warn);">
+        <div class="card-title">Bước 2 — Nếu qua cổng</div>
+        <div style="font-size:11.5px; color:var(--warn); font-weight:600; margin-bottom:6px; font-family:var(--mono);">REAL MOTION → CLOSED-LOOP</div>
+        <ul style="padding-left:16px; font-size:12.8px; color:#cbd5e1; display:flex; flex-direction:column; gap:6px;">
+          <li>Nạp 1 clip SDD (Bookstore / DeathCircle), homography sang mét.</li>
+          <li>Chạy lại 3 cổng trên chuyển động thật, ưu tiên cổng 3 với mục tiêu đã chuẩn hóa.</li>
+          <li>Chỉ sau đó mới bàn tới closed-loop (còn blocker WSL).</li>
+        </ul>
+      </div>
+
+      <div class="card" style="border-top: 3px solid var(--ok);">
+        <div class="card-title">Bước 3 — Song song</div>
+        <div style="font-size:11.5px; color:var(--ok); font-weight:600; margin-bottom:6px; font-family:var(--mono);">DRAFT THEO HƯỚNG ĐÃ CHỐT</div>
+        <ul style="padding-left:16px; font-size:12.8px; color:#cbd5e1; display:flex; flex-direction:column; gap:6px;">
+          <li>Khởi tạo Overleaf template theo hướng đã thống nhất.</li>
+          <li>Đổ bảng số từ 43 &amp; 46 &amp; 48 vào draft, kèm ghi chú oracle-advantaged.</li>
+          <li>Hoàn thiện Related Work và Figure kiến trúc.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:16px; align-items:start;">
+      <div class="callout warn" style="margin:0; font-size:12.5px;">
+        <b>Điều kiện dừng (stop rule):</b> nếu feasibility/yield không tách được khỏi baseline <code>guided_rr</code>, dừng hướng phương pháp ngay trong tuần này và chuyển toàn bộ sang Option 2. Không kéo dài bằng thêm thực nghiệm tiếp xúc.
+      </div>
+      <div class="callout ok" style="margin:0; font-size:12.5px;">
+        <b>Nguyên tắc claim:</b> mọi con số 4.3–4.7% phải đi kèm ba nhãn — <i>baseline repair</i>, <i>synthetic</i>, <i>không so với SocNav</i>. Thiếu một nhãn là đủ để phản biện bác bỏ.
+      </div>
+    </div>
+
+    <div class="card highlight" style="margin-top:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:16px;">
+        <div>
+          <div style="font-weight:700; color:#fff; font-size:15px;">Tài liệu Đọc hiểu Phương pháp Chi tiết</div>
+          <div style="font-size:12.5px; color:var(--text-muted); margin-top:2px;">
+            Đã sẵn sàng file đọc <code>BAN_DOC_CHI_TIET_PHUONG_PHAP_VA_GO_NOGO_2026-11-26.html</code> kèm các công thức toán và phụ lục số liệu.
+          </div>
+          <div class="src-line" style="margin-top:8px;">Nguồn số liệu: Script 43 · Script 46 · Script 48 — log files đối chiếu, không thay đổi GPU/dữ liệu.</div>
+        </div>
+        <a href="BAN_DOC_CHI_TIET_PHUONG_PHAP_VA_GO_NOGO_2026-11-26.html" target="_blank" style="text-decoration:none; flex-shrink:0;">
+          <button class="btn-nav" style="background:var(--accent); color:#000; border:none; cursor:pointer;">
+            Mở Bản Đọc Chi Tiết ↗
+          </button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- NAV BAR CONTROLS -->
+<div class="nav-bar">
+  <button class="btn-nav" id="btn-prev" onclick="prevSlide()" disabled>← Slide trước</button>
+  <div class="progress-wrap">
+    <span id="slide-indicator" style="font-family:var(--mono); font-size:12px; color:var(--text-muted);">01 / 11</span>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+  <button class="btn-nav" id="btn-next" onclick="nextSlide()">Slide tiếp theo →</button>
+</div>
+
+<script>
+  let currentSlide = 1;
+  const totalSlides = 11;
+
+  function updateSlide() {
+    document.querySelectorAll('.slide').forEach((s, idx) => {
+      s.classList.toggle('active', (idx + 1) === currentSlide);
+    });
+    document.getElementById('slide-indicator').innerText = 
+      (currentSlide < 10 ? '0' : '') + currentSlide + ' / ' + totalSlides;
+    document.getElementById('progress-fill').style.width = 
+      (currentSlide / totalSlides * 100) + '%';
+    
+    document.getElementById('btn-prev').disabled = (currentSlide === 1);
+    document.getElementById('btn-next').disabled = (currentSlide === totalSlides);
+  }
+
+  function nextSlide() {
+    if (currentSlide < totalSlides) {
+      currentSlide++;
+      updateSlide();
+    }
+  }
+
+  function prevSlide() {
+    if (currentSlide > 1) {
+      currentSlide--;
+      updateSlide();
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+      e.preventDefault();
+      nextSlide();
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+      e.preventDefault();
+      prevSlide();
+    } else if (e.key === 'Home') {
+      e.preventDefault();
+      currentSlide = 1;
+      updateSlide();
+    } else if (e.key === 'End') {
+      e.preventDefault();
+      currentSlide = totalSlides;
+      updateSlide();
+    }
+  });
+
+  updateSlide();
+</script>
+
+</body>
+</html>

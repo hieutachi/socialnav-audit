@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dataset hiện có — trình bày theo cấu trúc Section 3 của SocNav</title>
+<style>
+  :root{
+    --ink:#111418; --ink2:#3a434e; --ink3:#6d7681;
+    --line:#e1e5ea; --line2:#eef1f4;
+    --paper:#f4f5f7;
+    --accent:#14487f; --accent2:#2c6ba8;
+    --ok:#14663f; --okbg:#eaf5ef;
+    --warn:#7d5310; --warnbg:#fdf3e2;
+    --bad:#8a1f1f; --badbg:#fbeeee;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Charter","Georgia","Cambria",serif;
+    font-size:16.5px;line-height:1.72;
+  }
+  .page{max-width:860px;margin:0 auto;background:#fff;padding:0 0 90px;
+    box-shadow:0 0 0 1px var(--line)}
+  .masthead{padding:52px 58px 34px;border-bottom:3px solid var(--ink);background:#fbfbfc}
+  .doctype{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--accent2);margin-bottom:16px;font-weight:600}
+  h1{font-size:27px;line-height:1.3;margin:0 0 14px;font-weight:700;letter-spacing:-.01em}
+  .sub{font-size:15px;color:var(--ink3);margin:0;font-style:italic;line-height:1.6}
+  .meta{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);
+    font-family:var(--mono);font-size:11.5px;color:var(--ink3);display:flex;gap:26px;flex-wrap:wrap}
+  .body{padding:0 58px}
+
+  h2{font-size:20px;margin:46px 0 6px;font-weight:700;letter-spacing:-.005em}
+  h2 .sec{color:var(--accent);font-family:var(--mono);font-size:14px;margin-right:10px}
+  h3{font-size:16px;margin:30px 0 8px;font-weight:700;font-family:-apple-system,"Segoe UI",sans-serif}
+  h4{font-size:14px;margin:22px 0 6px;font-weight:700;
+     font-family:-apple-system,"Segoe UI",sans-serif;color:var(--ink2)}
+  p{margin:0 0 14px}
+  ul,ol{margin:0 0 16px;padding-left:24px}
+  li{margin-bottom:6px}
+  strong{font-weight:700}
+  code{font-family:var(--mono);font-size:.85em;background:#f1f3f6;
+    padding:1px 5px;border-radius:3px;color:#24405e}
+  a{color:var(--accent2);text-decoration:none;border-bottom:1px solid #c3d5e6}
+
+  .tw{overflow-x:auto;margin:20px 0;border:1px solid var(--line)}
+  table{border-collapse:collapse;width:100%;font-size:13px;
+    font-family:-apple-system,"Segoe UI",sans-serif;background:#fff}
+  th{background:#f2f4f7;text-align:left;padding:9px 12px;font-weight:700;
+    border-bottom:1.5px solid #ccd3db;color:#1e2937;font-size:12px}
+  td{padding:8px 12px;border-bottom:1px solid var(--line2);vertical-align:top;line-height:1.5}
+  tr:last-child td{border-bottom:none}
+  td.n,th.n{text-align:right;font-family:var(--mono);font-size:12px;
+    font-variant-numeric:tabular-nums}
+  caption{caption-side:top;text-align:left;font-size:12.5px;color:var(--ink3);
+    padding:0 0 7px;font-family:-apple-system,"Segoe UI",sans-serif;font-style:italic}
+  .note{font-size:12.5px;color:var(--ink3);margin:-10px 0 22px;
+    font-family:-apple-system,"Segoe UI",sans-serif;line-height:1.55}
+
+  .box{padding:14px 18px;margin:20px 0;border-left:3px solid var(--accent2);
+    background:#f5f8fb;font-size:14.5px;font-family:-apple-system,"Segoe UI",sans-serif;line-height:1.65}
+  .box p:last-child{margin-bottom:0}
+  .box .l{font-family:var(--mono);font-size:10px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--accent2);display:block;margin-bottom:5px;font-weight:700}
+  .box.ok{border-left-color:#1a7a4a;background:var(--okbg)}
+  .box.ok .l{color:var(--ok)}
+  .box.warn{border-left-color:#b8860b;background:var(--warnbg)}
+  .box.warn .l{color:var(--warn)}
+  .box.bad{border-left-color:#a83232;background:var(--badbg)}
+  .box.bad .l{color:var(--bad)}
+
+  pre{background:#0f1720;color:#d6e2ee;padding:15px 18px;border-radius:4px;
+    font-family:var(--mono);font-size:12px;line-height:1.7;overflow-x:auto;margin:18px 0}
+  pre .c{color:#7a91a6}
+  pre .k{color:#8dc4ee}
+
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+    gap:1px;background:var(--line);border:1px solid var(--line);margin:24px 0}
+  .kpi{background:#fff;padding:14px 16px}
+  .kpi b{display:block;font-family:var(--mono);font-size:20px;font-weight:700;
+    color:var(--accent);line-height:1.2;letter-spacing:-.02em}
+  .kpi span{display:block;font-size:11.5px;color:var(--ink3);margin-top:4px;
+    font-family:-apple-system,"Segoe UI",sans-serif;line-height:1.4}
+
+  hr{border:none;border-top:1px solid var(--line);margin:38px 0}
+  .foot{margin-top:44px;padding-top:20px;border-top:2px solid var(--ink);
+    font-size:12px;color:var(--ink3);font-family:-apple-system,"Segoe UI",sans-serif;line-height:1.65}
+  .tag{display:inline-block;font-family:var(--mono);font-size:10px;padding:1px 6px;
+    border-radius:3px;letter-spacing:.04em;vertical-align:middle}
+  .tag.y{background:#dff0e6;color:#14663f;border:1px solid #b9dcc8}
+  .tag.n{background:#fbdddd;color:#8a1f1f;border:1px solid #efc0c0}
+  .tag.p{background:#fdf0d5;color:#7d5310;border:1px solid #ecd9a8}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="masthead">
+  <div class="doctype">Kiểm kê dữ liệu · Trình bày theo Section 3 của SocNav</div>
+  <h1>Dataset hiện có trong repo, đối chiếu với cấu trúc SocNav Dataset &amp; Benchmark</h1>
+  <p class="sub">
+    Toàn bộ đường dẫn, số file và dung lượng dưới đây được đọc trực tiếp từ đĩa tại thời điểm lập báo cáo.
+    Khung trình bày bám theo Section 3 (3.1 Dataset / 3.2 Benchmark) của arXiv 2511.21135v2 để tiện đối chiếu.
+  </p>
+  <div class="meta">
+    <span>2026-11-26 21:30 ICT</span>
+    <span>ROOT = C:\Users\N4G\qcom_socialnav</span>
+  </div>
+</div>
+
+<div class="body">
+
+<h2><span class="sec">§3.1</span>Dataset — nhìn theo ba tầng của pyramid</h2>
+
+<p>
+  Paper gốc tổ chức dữ liệu thành <em>Expert Trajectories Pyramid</em> gồm ba tầng (video internet → scene
+  mô phỏng → robot thật) cộng thêm một nhánh cognition (CAD). Repo của chúng ta chỉ có <strong>tầng đáy</strong>
+  của pyramid đó, cộng thêm hai thứ mà paper không có: cache hidden state và sprite người đi bộ.
+  Dưới đây là bản kiểm kê đầy đủ.
+</p>
+
+<div class="kpis">
+  <div class="kpi"><b>18</b><span>trajectory CityWalker</span></div>
+  <div class="kpi"><b>18.551</b><span>frame RGB (.jpg)</span></div>
+  <div class="kpi"><b>19.205</b><span>mẫu ngoài PF (train + valx)</span></div>
+  <div class="kpi"><b>170</b><span>ảnh Penn-Fudan</span></div>
+  <div class="kpi"><b>338</b><span>sprite người dùng làm stimuli</span></div>
+</div>
+
+<h3>Tầng 1 — Quỹ đạo robot thật (tương ứng D<sub>real</sub>)</h3>
+
+<p>
+  Đây là tầng duy nhất có dữ liệu cảm biến thật. Nó tương ứng với phần <em>CityWalker teleoperation data</em>
+  mà paper liệt kê trong D<sub>real</sub> (340K trajectory) — nhưng chúng ta chỉ có một tập con rất nhỏ.
+</p>
+
+<div class="tw">
+<table>
+  <caption>Bảng 1. Cấu trúc thư mục dữ liệu robot</caption>
+  <thead><tr><th style="width:290px">Đường dẫn</th><th style="width:130px">Nội dung</th><th class="n" style="width:90px">Số lượng</th><th class="n" style="width:100px">Dung lượng</th></tr></thead>
+  <tbody>
+    <tr><td><code>data/citywalker_obs/traj_nav_01..18/</code></td><td>Ảnh RGB; chu kỳ cần đối chiếu timestamp/frame ID</td><td class="n">18.551 jpg</td><td class="n">7,45 GB</td></tr>
+    <tr><td><code>data/citywalker_obs/traj_nav_01..18.zip</code></td><td>Bản nén gốc tải về</td><td class="n">18 zip</td><td class="n">7,60 GB</td></tr>
+    <tr><td><code>data/citywalker_pose/pose_label/pose_traj_01..18.txt</code></td><td>GPS + pose 6-DoF + nhãn</td><td class="n">18 file</td><td class="n">4,2 MB</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Mỗi file <code>pose_traj_XX.txt</code> có cấu trúc <strong>ba dòng cho một frame</strong>: dòng 1 là GPS
+  (timestamp, lat, lon, alt, …), dòng 2 là pose 6-DoF cộng chỉ số frame, dòng 3 là vector nhãn. Hàm
+  <code>load_traj()</code> trong <code>sn_common.py</code> đọc đúng định dạng này và quy đổi lat/lon về toạ độ
+  local theo mét, neo tại frame đầu.
+</p>
+
+<div class="tw">
+<table>
+  <caption>Bảng 2. Thống kê 18 trajectory — frame ảnh, bản ghi pose, chu kỳ timestamp</caption>
+  <thead><tr><th class="n">Traj</th><th class="n">Frame ảnh</th><th class="n">Dòng pose</th><th class="n">Bản ghi</th><th class="n">Ảnh / bản ghi</th><th class="n">Δt trung vị (s)</th><th>Ghi chú</th></tr></thead>
+  <tbody>
+    <tr><td class="n">01</td><td class="n">1.087</td><td class="n">3.267</td><td class="n">1.089</td><td class="n">1,00</td><td class="n">1,023</td><td>Chu kỳ ~1 s</td></tr>
+    <tr><td class="n">02</td><td class="n">905</td><td class="n">2.715</td><td class="n">905</td><td class="n">1,00</td><td class="n">1,022</td><td></td></tr>
+    <tr><td class="n">03</td><td class="n">678</td><td class="n">2.073</td><td class="n">691</td><td class="n">0,98</td><td class="n">1,019</td><td></td></tr>
+    <tr><td class="n">04</td><td class="n">1.252</td><td class="n">3.837</td><td class="n">1.279</td><td class="n">0,98</td><td class="n">1,020</td><td>Dài nhất sau traj 18</td></tr>
+    <tr><td class="n">05</td><td class="n">557</td><td class="n">1.671</td><td class="n">557</td><td class="n">1,00</td><td class="n">1,023</td><td>Dùng cho pilot</td></tr>
+    <tr><td class="n">06</td><td class="n">270</td><td class="n">810</td><td class="n">270</td><td class="n">1,00</td><td class="n">1,022</td><td>Ngắn nhất</td></tr>
+    <tr><td class="n">07</td><td class="n">405</td><td class="n">1.254</td><td class="n">418</td><td class="n">0,97</td><td class="n">1,005</td><td></td></tr>
+    <tr><td class="n">08</td><td class="n">343</td><td class="n">1.035</td><td class="n">345</td><td class="n">0,99</td><td class="n">1,021</td><td>Tách riêng làm valx</td></tr>
+    <tr><td class="n">09</td><td class="n">569</td><td class="n">1.749</td><td class="n">583</td><td class="n">0,98</td><td class="n">1,023</td><td></td></tr>
+    <tr><td class="n">10</td><td class="n">1.119</td><td class="n">3.681</td><td class="n">1.227</td><td class="n">0,91</td><td class="n">0,431</td><td><strong>Chu kỳ khác</strong></td></tr>
+    <tr><td class="n">11</td><td class="n">613</td><td class="n">1.872</td><td class="n">624</td><td class="n">0,98</td><td class="n">0,999</td><td></td></tr>
+    <tr><td class="n">12</td><td class="n">901</td><td class="n">3.171</td><td class="n">1.057</td><td class="n">0,85</td><td class="n">0,364</td><td><strong>Chu kỳ khác</strong></td></tr>
+    <tr><td class="n">13</td><td class="n">618</td><td class="n">1.857</td><td class="n">619</td><td class="n">1,00</td><td class="n">1,005</td><td></td></tr>
+    <tr><td class="n">14</td><td class="n">910</td><td class="n">3.306</td><td class="n">1.102</td><td class="n">0,83</td><td class="n">0,387</td><td><strong>Chu kỳ khác</strong></td></tr>
+    <tr><td class="n">15</td><td class="n">1.071</td><td class="n">3.462</td><td class="n">1.154</td><td class="n">0,93</td><td class="n">0,471</td><td><strong>Chu kỳ khác</strong></td></tr>
+    <tr><td class="n">16</td><td class="n">1.052</td><td class="n">3.489</td><td class="n">1.163</td><td class="n">0,90</td><td class="n">0,445</td><td><strong>Chu kỳ khác</strong></td></tr>
+    <tr><td class="n">17</td><td class="n">616</td><td class="n">1.848</td><td class="n">616</td><td class="n">1,00</td><td class="n">1,015</td><td></td></tr>
+    <tr><td class="n">18</td><td class="n">5.585</td><td class="n">1.617</td><td class="n">539</td><td class="n">10,36</td><td class="n">1,007</td><td><strong>Dùng cho mọi thí nghiệm</strong></td></tr>
+    <tr style="background:#f7f9fb"><td class="n"><strong>Tổng</strong></td><td class="n"><strong>18.551</strong></td><td class="n"><strong>42.714</strong></td><td class="n"><strong>14.238</strong></td><td class="n">—</td><td class="n">—</td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="box warn">
+  <span class="l">Hai điểm bất thường phải biết trước khi dùng dữ liệu</span>
+  <p>
+    <strong>(1) Traj 18 lệch cấu trúc.</strong> Nó có 5.585 ảnh nhưng file pose chỉ 1.617 dòng.
+    Với cấu trúc ba dòng một bản ghi, đây là <strong>539 bản ghi pose</strong> — tức <strong>10,4 ảnh
+    cho mỗi bản ghi</strong>, trong khi 17 trajectory còn lại khoảng 0,83–1,00 ảnh/bản ghi. Chỉ số frame trong bản ghi
+    nhảy bước 10, xác nhận ảnh và pose không cùng nhịp. Vì vậy mọi cửa sổ
+    trượt phải tính theo chỉ số pose, không theo chỉ số ảnh; cần kiểm tra ánh xạ frame ID trong loader trước khi dùng để diễn giải chuyển động.
+    <br>
+    <strong>(2) Năm trajectory có Δt gần 0,4 s, không phải 1,0 s</strong> (traj 10, 12, 14, 15, 16 — đúng 5 dòng
+    trong Bảng 2). Nếu trộn
+    chúng với nhóm 1 Hz mà không resample, vận tốc sẽ sai gần 2,5 lần. Đây là lỗi im lặng — không crash,
+    chỉ cho số liệu sai.
+  </p>
+</div>
+
+<h3>Tầng 2 — Cache hidden state của VLM (không có trong paper)</h3>
+
+<p>
+  Đây là tầng lớn nhất về dung lượng và là thứ paper không mô tả. VLM bị đóng băng, nên mỗi trạng thái chỉ cần
+  một forward; hidden state lớp cuối (đầu vào của action expert) được lưu thành <code>float16</code> để train
+  head mà không phải chạy lại VLM. Kích thước mỗi mẫu là <code>1032 × 2048</code> hệ số.
+</p>
+
+<div class="tw">
+<table>
+  <caption>Bảng 3. Các file cache hidden state</caption>
+  <thead><tr><th style="width:130px">File</th><th class="n" style="width:110px">Số mẫu</th><th style="width:130px">Shape</th><th class="n" style="width:100px">Dung lượng</th><th>Dùng cho</th></tr></thead>
+  <tbody>
+    <tr><td><code>H.npy</code></td><td class="n">2.292</td><td>1032 × 2048</td><td class="n">9,02 GB</td><td>Tập pilot đầu, 13 điều kiện</td></tr>
+    <tr><td><code>H_more.npy</code></td><td class="n">10.098</td><td>1032 × 2048</td><td class="n">39,75 GB</td><td>Mở rộng 17 trajectory</td></tr>
+    <tr><td><code>H_more2.npy</code></td><td class="n">6.566</td><td>1032 × 2048</td><td class="n">25,85 GB</td><td>Mở rộng tiếp</td></tr>
+    <tr><td><code>H_valx.npy</code></td><td class="n">249</td><td>1032 × 2048</td><td class="n">0,98 GB</td><td>Validation tách riêng (traj 8)</td></tr>
+    <tr><td><code>H_pf.npy</code></td><td class="n">1.900</td><td>1032 × 2048</td><td class="n">7,48 GB</td><td><strong>Benchmark Penn-Fudan hiện tại</strong></td></tr>
+    <tr style="background:#f7f9fb"><td><strong>Tổng</strong></td><td class="n"><strong>21.105</strong></td><td>—</td><td class="n"><strong>83,08 GB</strong></td><td>—</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="note">
+  Số mẫu có cache là 21.105 nhưng chỉ 19.205 mẫu có metadata trạng thái đi kèm (2.292 + 10.098 + 6.566 + 249).
+  Con số 1.900 của <code>H_pf</code> là tập benchmark riêng, không nằm trong chuỗi train.
+</p>
+
+<div class="box">
+  <span class="l">Cập nhật trạng thái sử dụng <code>H_pf</code> (sau script 48)</span>
+  <p>
+    Từ script 41 trở đi, mọi thí nghiệm đều đọc <code>H_pf.npy</code> + <code>states_pf.json</code>. Script 48
+    (đối chứng cùng giao thức) tiêu thụ <strong>608 / 1.900 trạng thái</strong> theo 38 batch nguyên vẹn — tức
+    32% file benchmark. Các script trước cũng sử dụng bộ dữ liệu này. Vì thế
+    <strong>đây là bộ benchmark được dùng lại để kiểm toán, không phải tập test hoàn toàn mới</strong>.
+    “Held-out” trong 46/48 chỉ việc tách các mẫu tương lai dùng chấm khỏi các mẫu tương lai dùng chọn;
+    không hàm ý tách trajectory hay tách cửa sổ cảnh.
+  </p>
+</div>
+
+<h3>Tầng 3 — Stimuli người đi bộ (thay cho trajectory người thật)</h3>
+
+<p>
+  Paper không có tầng này — họ dùng người mô phỏng trong Isaac Sim cho benchmark, và người thật trong ảnh
+  internet cho CAD. Chúng ta dùng cách thứ ba: <strong>cắt sprite người từ ảnh thật rồi dán vào khung nền
+  CityWalker</strong>. Đây là điểm khác biệt bản chất, không phải khác biệt về lượng.
+</p>
+
+<div class="tw">
+<table>
+  <caption>Bảng 4. Nguồn sprite và cách sinh</caption>
+  <thead><tr><th style="width:300px">Đường dẫn</th><th>Nội dung</th></tr></thead>
+  <tbody>
+    <tr><td><code>pennfudan/PennFudanPed.zip</code></td><td>Bản nén gốc, 53,7 MB</td></tr>
+    <tr><td><code>pennfudan/PennFudanPed/PNGImages/</code></td><td>170 ảnh PNG người đi bộ ngoài trời</td></tr>
+    <tr><td><code>pennfudan/PennFudanPed/Annotation/</code></td><td>170 file annotation PASCAL VOC + bounding box</td></tr>
+    <tr><td><code>pennfudan/PennFudanPed/PedMasks/</code></td><td>170 mask PNG, pixel &gt; 0 là ID người</td></tr>
+    <tr><td><code>pilot_sprites.json</code></td><td>24 sprite train chọn theo chiều cao 70–250 px</td></tr>
+    <tr><td><code>stimuli.CONDITIONS</code></td><td>12 điều kiện dán sprite: static / left / right / headon / crossing, ở 2 / 3 / 5 m</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Toàn bộ 338 "người" trong benchmark đến từ 170 ảnh Penn-Fudan, sau khi lọc theo tiêu chí trong
+  <code>20_build_pilot_states.py</code>: chiều cao hộp 70–250 px, tỉ lệ cao/rộng 1,8–4,5, nằm trọn trong khung,
+  và không trùng với người dùng làm test sprite.
+</p>
+
+<hr>
+
+<h2><span class="sec">§3.2</span>Benchmark — tập đánh giá hiện tại</h2>
+
+<p>
+  Paper dựng 9 cảnh 3DGS mới (73.000 m²), mỗi cảnh 10 cặp start-goal ở 20 m và 100 m, thành 180 case
+  closed-loop. Chúng ta <strong>không có</strong> bất kỳ phần nào của benchmark đó. Thứ chúng ta có là một
+  benchmark open-loop tự dựng trên một trajectory duy nhất.
+</p>
+
+<div class="tw">
+<table>
+  <caption>Bảng 5. Cấu trúc <code>states_pf.json</code> — benchmark open-loop hiện tại</caption>
+  <thead><tr><th style="width:190px">Điều kiện</th><th class="n" style="width:110px">Số trạng thái</th><th style="width:130px">Vận tốc người</th><th>Đặc điểm</th></tr></thead>
+  <tbody>
+    <tr><td><code>ped_headon_3m</code></td><td class="n">380</td><td><code>(0, −1)</code></td><td><strong>Duy nhất có chuyển động</strong></td></tr>
+    <tr><td><code>ped_left_3m</code></td><td class="n">380</td><td><code>(0, 0)</code></td><td>Đứng yên, lệch ngang −0,7 m</td></tr>
+    <tr><td><code>ped_right_3m</code></td><td class="n">380</td><td><code>(0, 0)</code></td><td>Đứng yên, lệch ngang +0,7 m</td></tr>
+    <tr><td><code>ped_static_2m</code></td><td class="n">380</td><td><code>(0, 0)</code></td><td>Đứng yên, cách 2 m</td></tr>
+    <tr><td><code>ped_static_3m</code></td><td class="n">380</td><td><code>(0, 0)</code></td><td>Đứng yên, cách 3 m</td></tr>
+    <tr style="background:#f7f9fb"><td><strong>Tổng</strong></td><td class="n"><strong>1.900</strong></td><td>—</td><td>338 sprite khác nhau</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Mỗi trạng thái mang các trường: <code>ped</code> (4 số: x, y, vx, vy), <code>gt_m</code> (5 waypoint thật
+  của robot, đơn vị mét), <code>base_zero_noise_m</code> (5 waypoint của prior không nhiễu), <code>step_scale</code>,
+  <code>sprite</code>, <code>ps</code> (chỉ số pose), <code>d</code>, <code>lat</code>, <code>v_ped</code>.
+  Horizon 5 giây, lấy mẫu 51 điểm.
+</p>
+
+<div class="box bad">
+  <span class="l">Sự thật phải nói rõ khi đối chiếu với paper</span>
+  <p>
+    Chỉ <strong>380 / 1.900</strong> trạng thái có người chuyển động, và tất cả đều cùng một vận tốc
+    <code>(0, −1)</code>. Bốn điều kiện còn lại có vận tốc bằng không, nên mọi tương lai sinh ra trùng khít
+    nhau. Tập này <em>không</em> đo được năng lực dự báo chuyển động người — nó chỉ đo được phản ứng với
+    một người đi thẳng duy nhất.
+  </p>
+</div>
+
+<h3>So sánh trực tiếp với paper</h3>
+
+<div class="tw">
+<table>
+  <caption>Bảng 6. Đối chiếu thành phần theo Section 3 của paper</caption>
+  <thead><tr><th style="width:170px">Thành phần</th><th style="width:230px">Paper (arXiv 2511.21135)</th><th>Hiện có trong repo</th><th class="n" style="width:60px">Trạng thái</th></tr></thead>
+  <tbody>
+    <tr><td><strong>D<sub>video</sub></strong></td><td>2,0 M pseudo-trajectory từ video internet, dựng 3D bằng π³ + MoGe</td><td>Không có</td><td class="n"><span class="tag n">Thiếu</span></td></tr>
+    <tr><td><strong>D<sub>sim</sub></strong></td><td>1,7 M trajectory; SocialGS 3.400 cảnh (4,5 km²); SocCity 3,37 km²</td><td>Không có</td><td class="n"><span class="tag n">Thiếu</span></td></tr>
+    <tr><td><strong>D<sub>real</sub></strong></td><td>340 K trajectory từ SCAND, Huron, Recon, CityWalker teleop</td><td>18 trajectory CityWalker, 18.551 frame, 7,45 GB</td><td class="n"><span class="tag p">Một phần</span></td></tr>
+    <tr><td><strong>D<sub>cog</sub> — traversability</strong></td><td>1,2 M mẫu polygon vùng đi được</td><td>Không có</td><td class="n"><span class="tag n">Thiếu</span></td></tr>
+    <tr><td><strong>D<sub>cog</sub> — CoT</strong></td><td>825 K mẫu sinh bởi Qwen2.5-VL-72B</td><td>Không có</td><td class="n"><span class="tag n">Thiếu</span></td></tr>
+    <tr><td><strong>D<sub>cog</sub> — VQA</strong></td><td>1 M mẫu VQA tổng quát</td><td>Không có</td><td class="n"><span class="tag n">Thiếu</span></td></tr>
+    <tr style="background:#f7f9fb"><td><strong>Tổng dataset</strong></td><td><strong>&gt; 7 M mẫu</strong></td><td><strong>~21,1 K mẫu có cache</strong></td><td class="n">—</td></tr>
+    <tr><td><strong>Benchmark scenes</strong></td><td>9 cảnh 3DGS mới, 73.000 m², Isaac Sim</td><td>Không có</td><td class="n"><span class="tag n">Thiếu</span></td></tr>
+    <tr><td><strong>Benchmark cases</strong></td><td>180 case closed-loop (10 cặp × 20/100 m × 9 cảnh)</td><td>1.900 trạng thái open-loop, 1 trajectory</td><td class="n"><span class="tag p">Khác loại</span></td></tr>
+    <tr><td><strong>Chỉ số</strong></td><td>MAOE, SR, RC, SPL, DCR, TCR</td><td>Proxy tiếp xúc 0,45 m, góc quay, lệch ngang</td><td class="n"><span class="tag p">Khác loại</span></td></tr>
+    <tr><td><strong>Người</strong></td><td>Digital human trong Isaac Sim</td><td>Sprite Penn-Fudan dán lên ảnh thật</td><td class="n"><span class="tag p">Khác loại</span></td></tr>
+    <tr><td><strong>Cache hidden state</strong></td><td>Không công bố</td><td>83,08 GB, 21.105 mẫu</td><td class="n"><span class="tag y">Có thêm</span></td></tr>
+  </tbody>
+</table>
+</div>
+
+<hr>
+
+<h2>Đọc bảng này thế nào</h2>
+
+<p>Ba kết luận thẳng, không tô hồng:</p>
+
+<ol>
+  <li><strong>Đây không phải một dataset mới.</strong> Nó là một <em>tập con rất nhỏ</em> của D<sub>real</sub>
+    trong paper (18 trajectory so với 340 K), cộng một benchmark open-loop tự dựng. Gọi nó là
+    "SocNav dataset" trong bài báo sẽ là mô tả sai.</li>
+  <li><strong>Phần người đi bộ là tổng hợp, không phải dữ liệu quỹ đạo người.</strong> Paper có người mô phỏng
+    do Isaac Sim điều khiển; chúng ta có ảnh người thật nhưng <em>chuyển động do ta gán</em>. Đây chính là
+    lý do 4/5 điều kiện có vận tốc bằng không — và là gốc của mọi kết quả không dùng để tuyên bố được.</li>
+  <li><strong>Phần có giá trị thực sự chưa được khai thác hết.</strong> 18.551 frame thật với pose 6-DoF và GPS
+    là tài sản đáng kể. Nó đủ để làm một benchmark open-loop có ý nghĩa — nhưng chỉ khi tách theo từng
+    trajectory và kiểm soát Δt (xem cảnh báo ở Bảng 2).</li>
+</ol>
+
+<div class="box ok">
+  <span class="l">Việc cần làm trước khi mô tả dữ liệu trong bài</span>
+  <p>
+    <strong>(1)</strong> Chuẩn hoá lại Δt: đưa 5 trajectory nhịp 0,4 s về 1 Hz bằng nội suy, hoặc tách thành
+    nhóm riêng và báo cáo riêng. <strong>(2)</strong> Ghi rõ benchmark hiện tại chỉ có một điều kiện chuyển động.
+    <strong>(3)</strong> Bổ sung Penn-Fudan vào phần mô tả dữ liệu với nhãn "stimulus bank", không phải
+    "pedestrian trajectories". Ba việc này thuần tuý là mô tả đúng, không cần chạy lại thí nghiệm nào.
+  </p>
+</div>
+
+<div class="foot">
+  <p>
+    <strong>Nguồn số liệu:</strong> đọc trực tiếp từ đĩa, không suy diễn. Frame đếm bằng
+    <code>Get-ChildItem</code>; dòng pose và Δt tính bằng <code>scratch/traj_stats.py</code>;
+    Δt ở Bảng 2 được kiểm tra lại từ timestamp GPS của từng bản ghi ba dòng (khác nhẹ số cũ); shape cache đọc bằng <code>numpy.memmap</code>; điều kiện và vận tốc đọc từ <code>states_pf.json</code>
+    qua <code>scratch/dataset_inventory.py</code>. Định nghĩa các tầng lấy từ arXiv 2511.21135v2, Section 3.1–3.2.
+  </p>
+  <p>
+    Trajectory dùng trong mọi thí nghiệm từ script 41 trở đi là <code>traj 18</code>; các trajectory còn lại
+    chỉ xuất hiện trong <code>states_more</code> / <code>states_more2</code> dùng để train head.
+  </p>
+</div>
+
+</div>
+</div>
+</body>
+</html>

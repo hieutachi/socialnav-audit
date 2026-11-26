@@ -1,0 +1,855 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SocialNav + Diffusion — Báo cáo Hội đồng / GVHD</title>
+<style>
+:root{
+  --ink:#0f172a; --ink2:#334155; --muted:#64748b; --line:#e2e8f0;
+  --paper:#ffffff; --paper2:#f8fafc; --paper3:#f1f5f9;
+  --blue:#1d4ed8; --blue-l:#dbeafe; --teal:#0f766e; --teal-l:#ccfbf1;
+  --amber:#b45309; --amber-l:#fef3c7; --red:#b91c1c; --red-l:#fee2e2;
+  --violet:#6d28d9; --violet-l:#ede9fe;
+  --shadow:0 1px 2px rgba(15,23,42,.06),0 8px 24px -12px rgba(15,23,42,.18);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--paper2);color:var(--ink);line-height:1.65;font-size:15.5px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+
+/* ---------- Top bar ---------- */
+.topbar{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.topbar .wrap{display:flex;align-items:center;gap:26px;height:56px}
+.topbar .brand{font-weight:800;font-size:14px;letter-spacing:.4px;color:var(--blue)}
+.topbar a{font-size:12.5px;color:var(--muted);text-decoration:none;transition:color .18s}
+.topbar a:hover{color:var(--ink)}
+.topbar .tag{margin-left:auto;font-size:11.5px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:3px 12px;white-space:nowrap}
+
+/* ---------- Cover ---------- */
+.cover{background:linear-gradient(160deg,#0b1220 0%,#111c33 55%,#16233f 100%);color:#e8eefc;padding:72px 0 60px;position:relative;overflow:hidden}
+.cover::after{content:'';position:absolute;right:-120px;top:-120px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(56,189,248,.16),transparent 66%)}
+.cover::before{content:'';position:absolute;left:-80px;bottom:-160px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.14),transparent 66%)}
+.cover .wrap{position:relative;z-index:2}
+.kicker{display:inline-block;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#7dd3fc;border:1px solid rgba(125,211,252,.35);border-radius:99px;padding:5px 14px;margin-bottom:22px}
+.cover h1{font-size:2.55rem;line-height:1.2;font-weight:800;letter-spacing:-.5px;max-width:830px}
+.cover h1 em{font-style:normal;background:linear-gradient(100deg,#7dd3fc,#a78bfa);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.cover .thesis{font-size:1.1rem;color:#b8c6e0;max-width:760px;margin-top:20px;line-height:1.7}
+.cover .thesis strong{color:#fff;font-weight:600}
+.badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:32px}
+.badge{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;padding:6px 14px;border-radius:99px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);color:#cfdcef}
+.badge b{color:#fff;font-weight:700}
+.d{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+.d-g{background:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,.18)}
+.d-a{background:#fbbf24;box-shadow:0 0 0 3px rgba(251,191,36,.18)}
+.d-r{background:#f87171;box-shadow:0 0 0 3px rgba(248,113,113,.18)}
+.cover-meta{display:flex;gap:34px;flex-wrap:wrap;margin-top:40px;padding-top:22px;border-top:1px solid rgba(255,255,255,.12);font-size:12.5px;color:#8fa3c4}
+.cover-meta div span{display:block;font-size:10.5px;letter-spacing:1.2px;text-transform:uppercase;color:#61789e;margin-bottom:3px}
+.cover-meta div b{color:#dbe6f7;font-weight:600}
+
+/* ---------- Slides ---------- */
+main{padding:0 0 80px}
+.slide{padding:56px 0 8px}
+.slide + .slide{border-top:1px solid var(--line)}
+.snum{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--blue);font-weight:700;margin-bottom:8px}
+h2{font-size:1.75rem;font-weight:800;letter-spacing:-.3px;line-height:1.28;margin-bottom:10px}
+.lede{font-size:1.02rem;color:var(--ink2);max-width:820px;margin-bottom:26px}
+h3{font-size:1.02rem;font-weight:700;margin:26px 0 10px;color:var(--ink)}
+h4{font-size:.86rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin:20px 0 8px}
+p{margin-bottom:13px;color:var(--ink2)}
+strong{color:var(--ink)}
+.mono{font-family:'Cascadia Code','JetBrains Mono',ui-monospace,monospace;font-size:.88em;background:var(--paper3);border:1px solid var(--line);border-radius:5px;padding:1px 6px;color:#0b3a8a;white-space:nowrap}
+
+/* ---------- Cards / grids ---------- */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 24px;box-shadow:var(--shadow)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+@media(max-width:980px){.grid-5{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:820px){.grid-2,.grid-3,.grid-4,.grid-5{grid-template-columns:1fr}}
+
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.kpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--blue)}
+.kpi.t::before{background:var(--teal)} .kpi.a::before{background:var(--amber)} .kpi.r::before{background:var(--red)} .kpi.v::before{background:var(--violet)}
+.kpi .kw{font-size:10.5px;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kpi .kv{font-size:2rem;font-weight:800;letter-spacing:-1px;line-height:1.15;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.kpi .kv small{font-size:.9rem;font-weight:700;color:var(--muted);letter-spacing:0}
+.kpi .kn{font-size:12.5px;color:var(--ink2);line-height:1.5}
+.kpi .kf{font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+
+/* ---------- Notices ---------- */
+.note{border-radius:11px;padding:14px 18px;font-size:14px;margin:16px 0;border:1px solid;display:flex;gap:12px;align-items:flex-start}
+.note .ni{font-size:16px;line-height:1.35;flex:0 0 auto}
+.note-b{background:#eff6ff;border-color:#bfdbfe;color:#1e3a8a}
+.note-t{background:#f0fdfa;border-color:#99f6e4;color:#115e59}
+.note-a{background:#fffbeb;border-color:#fde68a;color:#78350f}
+.note-r{background:#fef2f2;border-color:#fecaca;color:#7f1d1d}
+.note strong{color:inherit}
+
+/* ---------- Pipeline ---------- */
+.pipe{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;margin:6px 0 4px}
+.pnode{flex:1 1 130px;min-width:120px;background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--muted);border-radius:10px;padding:12px 12px 10px;text-align:center;box-shadow:0 1px 2px rgba(15,23,42,.05)}
+.pnode .pl{font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:5px}
+.pnode .pn{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.35}
+.pnode .pd{font-size:10.5px;color:var(--muted);margin-top:5px;line-height:1.4}
+.pnode.core{border-top-color:var(--violet);background:var(--violet-l)}
+.pnode.core .pn{color:var(--violet)}
+.pnode.dec{border-top-color:var(--amber);background:var(--amber-l)}
+.pnode.dec .pn{color:var(--amber)}
+.pnode.out{border-top-color:var(--teal);background:var(--teal-l)}
+.pnode.out .pn{color:var(--teal)}
+.parrow{display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:15px;padding:0 4px;flex:0 0 auto}
+.pipe-cap{font-size:12.5px;color:var(--muted);margin-top:10px;font-style:italic}
+
+/* ---------- Tables ---------- */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--paper);margin:14px 0;box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+thead th{background:var(--paper3);color:var(--ink2);font-weight:700;font-size:12px;letter-spacing:.3px;text-align:left;padding:10px 13px;border-bottom:1px solid var(--line);white-space:nowrap}
+tbody td{padding:9px 13px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:#fafcff}
+.num{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.dim{color:var(--muted);font-weight:400}
+.best{color:var(--teal);font-weight:800}
+.worst{color:var(--red);font-weight:700}
+.policy{font-weight:600}
+.lbl{font-size:11px;padding:1.5px 8px;border-radius:99px;font-weight:700;white-space:nowrap}
+.lbl-b{background:var(--blue-l);color:#1e40af}
+.lbl-v{background:var(--violet-l);color:#5b21b6}
+.lbl-a{background:var(--amber-l);color:#92400e}
+.lbl-t{background:var(--teal-l);color:#115e59}
+.hist{display:inline-block;font-size:10.5px;letter-spacing:.7px;text-transform:uppercase;font-weight:800;color:#475569;background:#e2e8f0;border:1px solid #cbd5e1;border-radius:4px;padding:1px 7px;vertical-align:middle;white-space:nowrap}
+.bf-hy{background:#0d9488}
+.bf-grr{background:#155e75}
+
+/* ---------- Bars ---------- */
+.barrow{display:grid;grid-template-columns:132px 1fr 76px;gap:10px;align-items:center;margin:7px 0;font-size:12.5px}
+.barrow .bl{color:var(--ink2);font-weight:600;text-align:right}
+.bartrack{height:20px;background:var(--paper3);border-radius:5px;overflow:hidden;position:relative}
+.barfill{height:100%;border-radius:5px;display:flex;align-items:center;justify-content:flex-end;padding-right:6px;font-size:10.5px;font-weight:800;color:#fff;transition:width .4s}
+.bf-ung{background:#94a3b8}
+.bf-pt{background:#3b82f6}
+.bf-exp{background:#8b5cf6}
+.bf-cvar{background:#d97706}
+.bf-gui{background:#0f766e}
+.barval{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+.barval s{color:var(--muted);font-weight:400;text-decoration:none;font-size:10.5px;display:block}
+
+/* ---------- Flow / verdict ---------- */
+.verdict{display:grid;grid-template-columns:210px 1fr;gap:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--paper);box-shadow:var(--shadow)}
+.verdict .vs{background:linear-gradient(150deg,#065f46,#0f766e);color:#fff;padding:26px 22px;display:flex;flex-direction:column;justify-content:center}
+.verdict .vs .vt{font-size:10.5px;letter-spacing:1.6px;text-transform:uppercase;color:#9ae6d8}
+.verdict .vs .vv{font-size:2.4rem;font-weight:800;letter-spacing:-1px;line-height:1.1;margin:6px 0}
+.verdict .vs .vn{font-size:12.5px;color:#c8f2e8}
+.verdict .vb{padding:24px 26px}
+@media(max-width:700px){.verdict{grid-template-columns:1fr}}
+
+.steps{list-style:none;counter-reset:s}
+.steps li{counter-increment:s;position:relative;padding:16px 0 16px 54px;border-bottom:1px dashed var(--line)}
+.steps li:last-child{border-bottom:none}
+.steps li::before{content:counter(s);position:absolute;left:0;top:15px;width:34px;height:34px;border-radius:9px;background:var(--blue);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center}
+.steps li .st{font-weight:700;font-size:14.5px;margin-bottom:2px}
+.steps li .sd{font-size:13px;color:var(--muted)}
+.steps li .sg{font-size:11.5px;color:var(--teal);font-weight:700;margin-top:5px;letter-spacing:.3px}
+
+.chk{list-style:none}
+.chk li{position:relative;padding-left:26px;margin-bottom:9px;font-size:14px;color:var(--ink2)}
+.chk li::before{content:'✓';position:absolute;left:0;top:0;color:var(--teal);font-weight:800}
+.chk.x li::before{content:'✕';color:var(--red)}
+
+.cols{columns:2;column-gap:32px}
+@media(max-width:700px){.cols{columns:1}}
+
+footer{background:#0b1220;color:#8fa3c4;padding:34px 0;font-size:12.5px}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+footer b{color:#dbe6f7}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand">SOCIALNAV · DIFFUSION</div>
+    <a href="#gap">Khoảng trống</a>
+    <a href="#method">Phương pháp</a>
+    <a href="#setup">Thiết lập</a>
+    <a href="#results">Kết quả 44</a>
+    <a href="#heldout">Held-out 48</a>
+    <a href="#limits">Giới hạn</a>
+    <a href="#roadmap">Lộ trình</a>
+    <div class="tag">Báo cáo Hội đồng · 26/11/2026</div>
+  </div>
+</div>
+
+<header class="cover">
+  <div class="wrap">
+    <div class="kicker">Proposed Method · Báo cáo tiến độ nghiên cứu</div>
+    <h1>Dự báo chuyển động người đi bộ bằng <em>Diffusion Model</em> để định lượng rủi ro trong Social Navigation</h1>
+    <p class="thesis">
+      Robot hiện tại <strong>nhìn thấy người nhưng không thật sự né người</strong>. Đề xuất: thay khối dự báo điểm
+      (point forecast) bằng một <strong>diffusion model sinh nhiều tương lai</strong>, rồi biến phân phối đó thành
+      <strong>đại lượng rủi ro có thể tính được</strong> (kỳ vọng / CVaR) để tái xếp hạng quỹ đạo. Exp48 sửa baseline:
+      <strong>guided + rerank đạt 4.7% contact held-out</strong> trên il3_s0, so với 30.3% của exp
+      (−25.58 pp, CI [−27.30; −23.90]). Đây là <strong>baseline repair, không phải kết quả của phương pháp mới</strong>.
+      <strong>GO</strong> cho phương pháp tiếp theo có ràng buộc feasibility/yield; <strong>NO GO</strong> cho claim đề xuất đạt 4.7%, vượt SocialNav hoặc đã an toàn.
+    </p>
+    <div class="badges">
+      <span class="badge"><i class="d d-g"></i>Held-out il3_s0 · exp <b>30.3%</b> → guided+rerank <b>4.7%</b></span>
+      <span class="badge"><i class="d d-g"></i>Primary contrast · <b>−25.58 pp</b> CI [−27.30; −23.90]</span>
+      <span class="badge"><i class="d d-a"></i>32 tương lai held-out <b>tổng hợp</b> · không phải scene thật</span>
+      <span class="badge"><i class="d d-r"></i>Chưa closed-loop · chưa so được SocialNav</span>
+    </div>
+    <div class="cover-meta">
+      <div><span>Người trình bày</span><b>NCS · Qcom Lab</b></div>
+      <div><span>Đơn vị</span><b>VNU-IS · INS2053</b></div>
+      <div><span>Loại báo cáo</span><b>Proposed Method + Kết quả sơ bộ</b></div>
+      <div><span>Trạng thái</span><b>GO khả thi · NO GO cho claim an toàn</b></div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ============ 1. GAP ============ -->
+<section class="slide" id="gap">
+  <div class="wrap">
+    <div class="snum">01 — Vấn đề</div>
+    <h2>Robot "thấy" người, nhưng không "hiểu" người sẽ đi đâu</h2>
+    <p class="lede">
+      Trong Social Navigation, chỉ phát hiện được vị trí người hiện tại là chưa đủ. Điều quyết định an toàn là
+      <strong>phân phối các quỹ đạo tương lai có thể xảy ra</strong> — thứ mà mọi hệ thống dùng point forecast
+      đều đang ném đi.
+    </p>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="lbl lbl-b">Hiện trạng</div>
+        <h3 style="margin-top:10px">Point forecast</h3>
+        <p style="font-size:13.5px;margin:0">Dự báo <strong>một</strong> quỹ đạo duy nhất cho mỗi người. Không có khái niệm "có thể anh ta rẽ trái". Sai số dự báo bị coi là nhiễu, không phải rủi ro.</p>
+      </div>
+      <div class="card">
+        <div class="lbl lbl-a">Hệ quả</div>
+        <h3 style="margin-top:10px">Rủi ro ẩn</h3>
+        <p style="font-size:13.5px;margin:0">Khi người đi bộ đổi hướng, hệ thống không có phương án dự phòng. Va chạm xảy ra <strong>không phải vì thiếu phản ứng</strong>, mà vì <strong>không biết trước để chọn</strong>.</p>
+      </div>
+      <div class="card" style="border-color:#c4b5fd;background:#faf5ff">
+        <div class="lbl lbl-v">Đề xuất</div>
+        <h3 style="margin-top:10px;color:var(--violet)">Generative forecast</h3>
+        <p style="font-size:13.5px;margin:0">Diffusion model sinh <strong>K tương lai</strong>. Từ đó tính được <strong>kỳ vọng rủi ro</strong> và <strong>CVaR</strong> — hai đại lượng mà point forecast không thể định nghĩa.</p>
+      </div>
+    </div>
+
+    <div class="note note-b">
+      <span class="ni">◆</span>
+      <div><strong>Luận điểm cốt lõi:</strong> giá trị của diffusion không nằm ở "dự báo chính xác hơn", mà ở chỗ nó tạo ra <strong>không gian xác suất</strong> để định nghĩa rủi ro. Chính vì vậy, phép so sánh đúng không phải Diffusion vs Point về accuracy, mà là <strong>quyết định dưới bất định</strong> vs <strong>quyết định dưới một điểm</strong>.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. METHOD ============ -->
+<section class="slide" id="method">
+  <div class="wrap">
+    <div class="snum">02 — Phương pháp đề xuất</div>
+    <h2>Pipeline: quan sát → sinh tương lai → định lượng rủi ro → chọn hành động</h2>
+    <p class="lede">
+      Toàn bộ đóng góp nằm ở hai khối giữa: <span class="mono">Diffusion Forecaster</span> và
+      <span class="mono">Risk Reranker</span>. Các khối còn lại là thành phần có sẵn của SocialNav.
+    </p>
+
+    <div class="pipe">
+      <div class="pnode">
+        <div class="pl">Input</div>
+        <div class="pn">Observation</div>
+        <div class="pd">RGB-D + pose<br/>vị trí người</div>
+      </div>
+      <div class="parrow">→</div>
+      <div class="pnode">
+        <div class="pl">Encoder</div>
+        <div class="pn">Latent Z</div>
+        <div class="pd">biểu diễn cảnh<br/>+ ngữ cảnh xã hội</div>
+      </div>
+      <div class="parrow">→</div>
+      <div class="pnode core">
+        <div class="pl">Đóng góp 1</div>
+        <div class="pn">Diffusion Forecaster</div>
+        <div class="pd">sinh K tương lai<br/>người đi bộ (K = 8)</div>
+      </div>
+      <div class="parrow">→</div>
+      <div class="pnode dec">
+        <div class="pl">Đóng góp 2</div>
+        <div class="pn">Risk Reranking</div>
+        <div class="pd">E[risk] · CVaR<br/>trên K mẫu</div>
+      </div>
+      <div class="parrow">→</div>
+      <div class="pnode out">
+        <div class="pl">Output</div>
+        <div class="pn">Action</div>
+        <div class="pd">quỹ đạo robot<br/>được chọn</div>
+      </div>
+    </div>
+    <div class="pipe-cap">Hình 1 — Pipeline đề xuất. Hai khối màu là đóng góp mới; các khối xám là hạ tầng có sẵn.</div>
+
+    <h3>Cơ chế định lượng rủi ro — phần "wow" về mặt phương pháp</h3>
+    <p>
+      Với mỗi quỹ đạo robot ứng viên <span class="mono">τ<sub>r</sub></span> và mỗi mẫu tương lai người
+      <span class="mono">τ<sub>p</sub><sup>(k)</sup></span>, ta tính khoảng cách nhỏ nhất theo thời gian. Từ đó:
+    </p>
+
+    <div class="grid-3">
+      <div class="card" style="border-top:3px solid var(--blue)">
+        <h4 style="margin-top:0">Kỳ vọng</h4>
+        <p style="font-family:'Cascadia Code',monospace;font-size:12.5px;background:var(--paper3);padding:8px 10px;border-radius:6px;margin-bottom:8px">E[r] = (1/K) Σ<sub>k</sub> r<sub>k</sub></p>
+        <p style="font-size:13px;margin:0">Trung bình rủi ro trên toàn bộ K tương lai. Phạt những quỹ đạo <em>thường xuyên</em> gần người.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--violet)">
+        <h4 style="margin-top:0">CVaR (đuôi rủi ro)</h4>
+        <p style="font-family:'Cascadia Code',monospace;font-size:12.5px;background:var(--paper3);padding:8px 10px;border-radius:6px;margin-bottom:8px">CVaR<sub>α</sub> = E[r | r ≥ q<sub>α</sub>]</p>
+        <p style="font-size:13px;margin:0">Trung bình nhóm tương lai xấu nhất. Thực nghiệm dùng <strong>nửa xấu nhất</strong> (4/8 mẫu, tức α = 0.5), không phải đuôi 10%.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--teal)">
+        <h4 style="margin-top:0">Chọn hành động</h4>
+        <p style="font-family:'Cascadia Code',monospace;font-size:12.5px;background:var(--paper3);padding:8px 10px;border-radius:6px;margin-bottom:8px">τ* = argmin<sub>τ</sub> [ cost(τ) + λ·ρ(τ) ]</p>
+        <p style="font-size:13px;margin:0">Kết hợp chi phí đường đi và rủi ro xã hội. <span class="mono">λ</span> điều khiển mức thận trọng.</p>
+      </div>
+    </div>
+
+    <div class="note note-t">
+      <span class="ni">◆</span>
+      <div><strong>Tại sao đây là đóng góp có ý nghĩa:</strong> CVaR là chuẩn rủi ro trong tài chính và điều khiển học, nhưng gần như <strong>chưa xuất hiện trong social navigation dùng generative model</strong>. Diffusion cung cấp đúng thứ CVaR cần — một phân phối mẫu. Point forecast <strong>không thể</strong> định nghĩa CVaR vì chỉ có một điểm.</div>
+    </div>
+
+    <h3>Hai cách dùng phân phối: rerank và gradient guidance</h3>
+    <div class="grid-2">
+      <div class="card">
+        <div class="lbl lbl-a">Cách A — Reranking (rời rạc)</div>
+        <p style="font-size:13.5px;margin:10px 0 0">Sinh K quỹ đạo robot, tính rủi ro cho từng quỹ đạo, chọn quỹ đạo tốt nhất. <strong>Ưu:</strong> đơn giản, không cần đạo hàm, dùng được với mọi model. <strong>Nhược:</strong> bị chặn trên bởi chất lượng tập ứng viên — nếu cả 16 đều tệ, chọn cái ít tệ nhất.</p>
+      </div>
+      <div class="card">
+        <div class="lbl lbl-b">Cách B — Gradient guidance (liên tục)</div>
+        <p style="font-size:13.5px;margin:10px 0 0">Thêm gradient của năng lượng rủi ro vào quá trình lấy mẫu của diffusion, <strong>dịch chuyển</strong> phân phối về vùng an toàn. <strong>Ưu:</strong> không bị chặn bởi tập ứng viên. <strong>Nhược:</strong> có thể phá vỡ tính hợp lệ động học của quỹ đạo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 3. SETUP ============ -->
+<section class="slide" id="setup">
+  <div class="wrap">
+    <div class="snum">03 — Thiết lập thực nghiệm</div>
+    <h2>Đo cái gì, trên cái gì, và đo như thế nào</h2>
+    <p class="lede">
+      Thực nghiệm được thiết kế để trả lời một câu hỏi duy nhất: <strong>chuyển từ point sang distribution có làm
+      giảm rủi ro va chạm thật sự, hay chỉ làm con số trông đẹp hơn?</strong>
+    </p>
+
+    <div class="grid-5">
+      <div class="kpi"><div class="kw">Trạng thái (danh nghĩa)</div><div class="kv">1.900</div><div class="kn">state từ Penn-Fudan</div><div class="kf">hiệu dụng 380 head-on / 306 sprite</div></div>
+      <div class="kpi v"><div class="kw">Chính sách robot</div><div class="kv">2</div><div class="kn">published · il3_s0</div><div class="kf">prior tốt / prior yếu</div></div>
+      <div class="kpi a"><div class="kw">Điều kiện người</div><div class="kv">5</div><div class="kn">headon · left · right<br/>static 2m · static 3m</div><div class="kf">cùng một bộ state</div></div>
+      <div class="kpi t"><div class="kw">Robot candidates</div><div class="kv">16</div><div class="kn">quỹ đạo / state</div><div class="kf">ngân sách cố định mọi cấu hình</div></div>
+      <div class="kpi v"><div class="kw">Pedestrian futures</div><div class="kv">8</div><div class="kn">tương lai / state</div><div class="kf">dùng cho E[risk] và CVaR</div></div>
+    </div>
+
+    <h3>Năm cấu hình được so sánh</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:210px">Cấu hình</th><th>Mô tả</th><th style="width:170px">Vai trò trong so sánh</th></tr></thead>
+        <tbody>
+          <tr><td class="policy">Unguided</td><td>Lấy mẫu gốc, không can thiệp</td><td class="dim">Baseline dưới</td></tr>
+          <tr><td class="policy">Point rerank-16</td><td>Chọn 1 quỹ đạo tốt nhất theo dự báo điểm, ngân sách 16</td><td><span class="lbl lbl-b">Baseline công bằng</span></td></tr>
+          <tr><td class="policy">Expected-risk rerank-16</td><td>Chọn theo <span class="mono">E[risk]</span> trên 16 tương lai</td><td><span class="lbl lbl-v">Đề xuất</span></td></tr>
+          <tr><td class="policy">CVaR rerank-16</td><td>Chọn theo <span class="mono">CVaR</span> (trung bình nửa xấu nhất của 8 tương lai)</td><td><span class="lbl lbl-v">Đề xuất (đuôi)</span></td></tr>
+          <tr><td class="policy">Gradient guidance</td><td>Dịch phân phối bằng gradient năng lượng rủi ro</td><td><span class="lbl lbl-a">Đề xuất (liên tục)</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note note-a">
+      <span class="ni">▲</span>
+      <div><strong>Điểm phải nói rõ trước hội đồng:</strong> các "tương lai người đi bộ" trong thực nghiệm này là <strong>nhiễu loạn tổng hợp (synthetic perturbation)</strong> trên quỹ đạo thật, <strong>không phải</strong> mẫu từ một diffusion forecaster đã huấn luyện trên dữ liệu chuyển động người thật. Vì vậy kết quả đo <strong>giá trị của cơ chế reranking</strong>, chưa đo <strong>giá trị của forecaster</strong>.</div>
+    </div>
+
+    <h3>Hai chế độ đo</h3>
+    <div class="grid-2">
+      <div class="card">
+        <h4 style="margin-top:0">Nominal</h4>
+        <p style="font-size:13.5px;margin:0">Người đi bộ giữ đúng quỹ đạo đã cho. Đo hiệu năng khi dự báo <strong>đúng</strong>. Đây là điều kiện các bài báo thường chỉ báo cáo.</p>
+      </div>
+      <div class="card">
+        <h4 style="margin-top:0">Perturbed</h4>
+        <p style="font-size:13.5px;margin:0">Quỹ đạo người bị nhiễu loạn so với dự báo. Đo <strong>độ bền vững</strong> khi dự báo <strong>sai</strong>. Đây mới là điều kiện quyết định an toàn thực tế.</p>
+      </div>
+    </div>
+
+    <p style="margin-top:16px">
+      Chỉ số chính là <strong>contact rate</strong> — trung bình chỉ báo khoảng cách robot–người dưới ngưỡng.
+      Ở exp48, đây là trung bình trên <strong>state × 32 tương lai held-out</strong>, không phải tỉ lệ state có bất kỳ contact nào trong 32 tương lai.
+      Đây là <strong>proxy open-loop</strong> trên quỹ đạo dự đoán, <strong>không</strong> phải mô phỏng đóng vòng.
+    </p>
+  </div>
+</section>
+
+<!-- ============ 4. RESULTS ============ -->
+<section class="slide" id="results">
+  <div class="wrap">
+    <div class="snum">04 — Kết quả lịch sử · script 44</div>
+    <h2><span class="hist">Historical / in-sample</span> Nominal và perturbed trước kiểm toán held-out</h2>
+    <p class="lede">
+      Trình bày trên chính sách <strong>il3_s0</strong> (prior yếu — nơi phương pháp có nhiều không gian cải thiện nhất),
+      điều kiện <strong>đối đầu trực diện 3 m</strong>, N = 380 state mỗi điều kiện.
+    </p>
+
+    <div class="grid-4">
+      <div class="kpi v"><div class="kw">Nominal · điểm</div><div class="kv">35.5<small>%</small></div><div class="kn">từ 72.9% unguided</div><div class="kf">giảm 37.4 điểm %</div></div>
+      <div class="kpi t"><div class="kw">Perturbed · kỳ vọng <span style="color:var(--red)">(in-sample)</span></div><div class="kv">25.3<small>%</small></div><div class="kn">từ 53.4% unguided</div><div class="kf" style="color:var(--red)">held-out: 30.3% — tệ hơn point 29.1%</div></div>
+      <div class="kpi a"><div class="kw">Khoảng cách perturbed</div><div class="kv">0.76<small>m</small></div><div class="kn">vs 0.73 m của point</div><div class="kf">+4% clearance</div></div>
+      <div class="kpi r"><div class="kw">Tỉ lệ đổi lựa chọn</div><div class="kv">19.7<small>%</small></div><div class="kn">kỳ vọng vs point</div><div class="kf">mức nhạy cảm của quyết định</div></div>
+    </div>
+
+    <h3>Bảng 1 — Chính sách il3_s0, điều kiện đối đầu 3 m (N = 380)</h3>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:200px">Cấu hình</th>
+            <th class="num">Contact<br/>nominal</th>
+            <th class="num">Contact<br/>perturbed</th>
+            <th class="num">Δ vs<br/>unguided</th>
+            <th class="num">Khoảng cách<br/>pert. (m)</th>
+            <th class="num">Góc quay<br/>(°)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="policy">Unguided</td><td class="num">72.9%</td><td class="num">53.4%</td><td class="num dim">—</td><td class="num dim">—</td><td class="num">8.1</td></tr>
+          <tr><td class="policy">Point rerank-16</td><td class="num">35.5%</td><td class="num">28.9%</td><td class="num" style="color:var(--teal)">−24.5</td><td class="num">0.73</td><td class="num">16.8</td></tr>
+          <tr><td class="policy">Expected-risk rerank-16 <span style="font-size:11px;color:var(--red)">(in-sample)</span></td><td class="num">37.6%</td><td class="num best">25.3%</td><td class="num best">−28.1</td><td class="num best">0.76</td><td class="num">16.3</td></tr>
+          <tr><td class="policy">CVaR rerank-16</td><td class="num">40.0%</td><td class="num">28.2%</td><td class="num" style="color:var(--teal)">−25.2</td><td class="num dim">—</td><td class="num dim">—</td></tr>
+          <tr><td class="policy">Gradient guidance</td><td class="num worst">23.4%</td><td class="num">26.1%</td><td class="num" style="color:var(--teal)">−27.3</td><td class="num dim">—</td><td class="num worst">22.2</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="pipe-cap">Δ tính trên contact perturbed so với unguided. Clearance và góc quay đo ở điều kiện perturbed.</div>
+
+    <h4>Trực quan hoá — mean contact rate perturbed, <span style="color:var(--red)">in-sample</span> (thấp hơn là tốt hơn)</h4>
+    <p style="font-size:12.5px;color:var(--muted);margin:-4px 0 10px">Các cột dưới đây là <strong>in-sample</strong>: tương lai dùng để chấm điểm nằm trong chính 8 tương lai dùng để chọn. Trên 32 tương lai held-out thứ tự đảo — xem mục 04b (exp48) cho bảng đầy đủ tám arm.</p>
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow)">
+      <div class="barrow"><div class="bl">Unguided</div><div class="bartrack"><div class="barfill bf-ung" style="width:53.4%">53.4%</div></div><div class="barval">53.4<s>baseline</s></div></div>
+      <div class="barrow"><div class="bl">Point rerank-16</div><div class="bartrack"><div class="barfill bf-pt" style="width:28.9%">28.9%</div></div><div class="barval">28.9<s>−24.5</s></div></div>
+      <div class="barrow"><div class="bl">Expected-risk</div><div class="bartrack"><div class="barfill bf-exp" style="width:25.3%">25.3%</div></div><div class="barval">25.3<s>−28.1</s></div></div>
+      <div class="barrow"><div class="bl">CVaR</div><div class="bartrack"><div class="barfill bf-cvar" style="width:28.2%">28.2%</div></div><div class="barval">28.2<s>−25.2</s></div></div>
+      <div class="barrow"><div class="bl">Gradient guid.</div><div class="bartrack"><div class="barfill bf-gui" style="width:26.1%">26.1%</div></div><div class="barval">26.1<s>−27.3</s></div></div>
+    </div>
+
+    <h3>Bảng 2 — Chính sách published, điều kiện đối đầu 3 m (N = 380)</h3>
+    <p style="font-size:13.5px">
+      Trong bảng lịch sử này, các reranker trên published có nominal contact 100%; đây là giới hạn của
+      <strong>pool và cấu hình đã thử ở script 44</strong>, không chứng minh prior không thể cải thiện.
+      Exp48 sửa baseline bằng guided pool + rerank và giảm held-out contact rõ rệt (mục 04b).
+    </p>
+    <div class="tw">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:200px">Cấu hình</th>
+            <th class="num">Contact<br/>nominal</th>
+            <th class="num">Contact<br/>perturbed</th>
+            <th class="num">Δ vs<br/>unguided</th>
+            <th class="num">Khoảng cách<br/>pert. (m)</th>
+            <th class="num">Góc quay<br/>(°)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="policy">Unguided</td><td class="num">100.0%</td><td class="num">72.1%</td><td class="num dim">—</td><td class="num dim">—</td><td class="num">2.3</td></tr>
+          <tr><td class="policy">Point rerank-16</td><td class="num">100.0%</td><td class="num">68.9%</td><td class="num" style="color:var(--teal)">−3.2</td><td class="num">0.36</td><td class="num">6.9</td></tr>
+          <tr><td class="policy">Expected-risk rerank-16</td><td class="num">100.0%</td><td class="num worst">61.1%</td><td class="num best">−11.0</td><td class="num best">0.41</td><td class="num">9.6</td></tr>
+          <tr><td class="policy">CVaR rerank-16</td><td class="num">100.0%</td><td class="num">64.7%</td><td class="num" style="color:var(--teal)">−7.4</td><td class="num dim">—</td><td class="num dim">—</td></tr>
+          <tr><td class="policy">Gradient guidance</td><td class="num">94.7%</td><td class="num">64.7%</td><td class="num" style="color:var(--teal)">−7.4</td><td class="num dim">—</td><td class="num">10.6</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note note-r">
+      <span class="ni">▲</span>
+      <div><strong>Con số cần hội đồng chú ý (script 44):</strong> ở published, reranking theo kỳ vọng đổi lựa chọn quỹ đạo ở <strong>75.5%</strong> số state (so với 19.7% ở il3_s0). Đây <strong>không phải dấu hiệu tốt</strong> — quyết định cực kỳ nhạy cảm với thay đổi nhỏ của phân phối. Chưa có kiểm định độ ổn định theo seed/window cho các arm của exp48.</div>
+    </div>
+
+    <h3>Kiểm chứng phụ: hành vi trên điều kiện tĩnh và bên hông</h3>
+    <div class="tw">
+      <table>
+        <thead><tr><th>Điều kiện (policy il3_s0)</th><th class="num">Unguided</th><th class="num">Point rerank</th><th class="num">Expected-risk</th><th class="num">Tỉ lệ đổi lựa chọn</th><th>Diễn giải</th></tr></thead>
+        <tbody>
+          <tr><td>Người đứng yên 2 m</td><td class="num">48.9%</td><td class="num">11.3%</td><td class="num">11.3%</td><td class="num">0.0%</td><td class="dim">Hai phương pháp trùng nhau hoàn toàn</td></tr>
+          <tr><td>Người đứng yên 3 m</td><td class="num">52.1%</td><td class="num">5.0%</td><td class="num">5.0%</td><td class="num">0.0%</td><td class="dim">Reranking có tác dụng, phân phối không thêm gì</td></tr>
+          <tr><td>Người đi bên trái 3 m</td><td class="num">1.6%</td><td class="num">0.0%</td><td class="num">0.0%</td><td class="num">0.0%</td><td class="dim">Bài toán đã dễ, không cần can thiệp</td></tr>
+          <tr><td>Người đi bên phải 3 m</td><td class="num">23.2%</td><td class="num">0.0%</td><td class="num">0.0%</td><td class="num">0.0%</td><td class="dim">Reranking xử lý triệt để</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:13px;color:var(--muted)">
+      Ý nghĩa lịch sử của bảng này: trong script 44, chênh lệch giữa chọn theo phân phối và chọn theo điểm chỉ xuất hiện ở điều kiện có bất định chuyển động.
+      Ở bốn điều kiện tất định, hai phương pháp cho kết quả <strong>giống hệt nhau</strong> — đó là kiểm tra sanity của thiết lập, không phải bằng chứng rằng phân phối chỉ có ích khi có bất định.
+      Script 46 và exp48 cho thấy kết luận phụ thuộc pool: unguided thì exp không hơn point, guided + rerank thì contact giảm mạnh nhưng kèm câu hỏi feasibility (G10).
+    </p>
+
+    <h3>Bằng chứng tích luỹ từ các thực nghiệm trước</h3>
+    <div class="grid-3">
+      <div class="card">
+        <div class="lbl lbl-b">Script 41 · Oracle</div>
+        <p style="font-size:13.5px;margin:10px 0 0">Khi cho guidance <strong>biết trước tương lai thật</strong>: il3_s0 giảm từ 66.5% → <strong>14.8%</strong> (4.5×). Published gần như không đổi (100% → 95.2%) <em>trong cấu hình oracle này</em>.</p>
+        <p style="font-size:12px;color:var(--muted);margin:8px 0 0">→ Chẩn đoán lịch sử ở cấu hình oracle này; không chứng minh prior published không thể cải thiện — exp48 cho thấy baseline sửa có cải thiện.</p>
+      </div>
+      <div class="card">
+        <div class="lbl lbl-a">Script 39 · Plausibility</div>
+        <p style="font-size:13.5px;margin:10px 0 0">Guidance làm góc quay tăng từ 8.1° → <strong>29.8°</strong> ở il3_s0 head-on. Ở điều kiện cột, contact <strong>không đổi</strong> (90.8% → 90.8%) vì hàm năng lượng không có thành phần chiếm chỗ.</p>
+        <p style="font-size:12px;color:var(--muted);margin:8px 0 0">→ Cần kiểm tra tính khả thi động học của quỹ đạo sau guidance.</p>
+      </div>
+      <div class="card">
+        <div class="lbl lbl-v">Tổng hợp</div>
+        <p style="font-size:13.5px;margin:10px 0 0">Ba nguồn bằng chứng độc lập cùng chỉ về một kết luận: <strong>cơ chế hoạt động, nhưng giới hạn bởi chất lượng prior và chất lượng forecaster</strong>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 4b. EXP48 BASELINE REPAIR ============ -->
+<section class="slide" id="heldout">
+  <div class="wrap">
+    <div class="snum">04b — Exp48 · baseline repair</div>
+    <h2>Guided pool + rerank: baseline mạnh hơn, không phải phương pháp mới</h2>
+    <p class="lede">380 head-on states / 306 sprites / 19 windows. Chọn bằng 8 tương lai, đánh giá trên <strong>32 tương lai tổng hợp held-out</strong> — không phải 32 scene mới. Contact dưới đây là trung bình trên state × future.</p>
+    <div class="tw"><table>
+      <thead><tr><th>Arm</th><th class="num">Published · contact %</th><th class="num">il3_s0 · contact %</th></tr></thead>
+      <tbody>
+        <tr><td class="policy">ung</td><td class="num">74.1</td><td class="num">53.4</td></tr>
+        <tr><td class="policy">pt</td><td class="num">70.3</td><td class="num">29.1</td></tr>
+        <tr><td class="policy">exp</td><td class="num">66.1</td><td class="num">30.3</td></tr>
+        <tr><td class="policy">cvar</td><td class="num">67.5</td><td class="num">31.7</td></tr>
+        <tr><td class="policy">gui</td><td class="num">62.1</td><td class="num">27.2</td></tr>
+        <tr><td class="policy">guided_rr_pt</td><td class="num">45.8</td><td class="num">4.3</td></tr>
+        <tr><td class="policy">guided_rr_exp</td><td class="num">47.1</td><td class="num">4.7</td></tr>
+        <tr><td class="policy">guided_rr_cvar</td><td class="num">49.1</td><td class="num">3.6</td></tr>
+      </tbody>
+    </table></div>
+    <h4>il3_s0 · mean contact held-out (thấp hơn là tốt hơn)</h4>
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow);margin-bottom:14px">
+      <div class="barrow"><div class="bl">ung</div><div class="bartrack"><div class="barfill bf-ung" style="width:53.4%">53.4</div></div><div class="barval">53.4<s>không chọn</s></div></div>
+      <div class="barrow"><div class="bl">pt</div><div class="bartrack"><div class="barfill bf-pt" style="width:29.1%">29.1</div></div><div class="barval">29.1<s>unguided pool</s></div></div>
+      <div class="barrow"><div class="bl">exp</div><div class="bartrack"><div class="barfill bf-exp" style="width:30.3%">30.3</div></div><div class="barval">30.3<s>primary so sánh</s></div></div>
+      <div class="barrow"><div class="bl">cvar</div><div class="bartrack"><div class="barfill bf-cvar" style="width:31.7%">31.7</div></div><div class="barval">31.7<s>unguided pool</s></div></div>
+      <div class="barrow"><div class="bl">gui</div><div class="bartrack"><div class="barfill bf-gui" style="width:27.2%">27.2</div></div><div class="barval">27.2<s>guidance đơn thuần</s></div></div>
+      <div class="barrow"><div class="bl">guided_rr_pt</div><div class="bartrack"><div class="barfill bf-hy" style="width:4.3%">&nbsp;</div></div><div class="barval">4.3<s>guided pool</s></div></div>
+      <div class="barrow"><div class="bl">guided_rr_exp</div><div class="bartrack"><div class="barfill bf-hy" style="width:4.7%">&nbsp;</div></div><div class="barval">4.7<s>baseline đã sửa</s></div></div>
+      <div class="barrow"><div class="bl">guided_rr_cvar</div><div class="bartrack"><div class="barfill bf-hy" style="width:3.6%">&nbsp;</div></div><div class="barval">3.6<s>guided pool</s></div></div>
+    </div>
+    <h4>published · mean contact held-out (thấp hơn là tốt hơn)</h4>
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)">
+      <div class="barrow"><div class="bl">ung</div><div class="bartrack"><div class="barfill bf-ung" style="width:74.1%">74.1</div></div><div class="barval">74.1<s>không chọn</s></div></div>
+      <div class="barrow"><div class="bl">pt</div><div class="bartrack"><div class="barfill bf-pt" style="width:70.3%">70.3</div></div><div class="barval">70.3<s>unguided pool</s></div></div>
+      <div class="barrow"><div class="bl">exp</div><div class="bartrack"><div class="barfill bf-exp" style="width:66.1%">66.1</div></div><div class="barval">66.1<s>secondary so sánh</s></div></div>
+      <div class="barrow"><div class="bl">cvar</div><div class="bartrack"><div class="barfill bf-cvar" style="width:67.5%">67.5</div></div><div class="barval">67.5<s>unguided pool</s></div></div>
+      <div class="barrow"><div class="bl">gui</div><div class="bartrack"><div class="barfill bf-gui" style="width:62.1%">62.1</div></div><div class="barval">62.1<s>guidance đơn thuần</s></div></div>
+      <div class="barrow"><div class="bl">guided_rr_pt</div><div class="bartrack"><div class="barfill bf-grr" style="width:45.8%">45.8</div></div><div class="barval">45.8<s>guided pool</s></div></div>
+      <div class="barrow"><div class="bl">guided_rr_exp</div><div class="bartrack"><div class="barfill bf-grr" style="width:47.1%">47.1</div></div><div class="barval">47.1<s>guided pool</s></div></div>
+      <div class="barrow"><div class="bl">guided_rr_cvar</div><div class="bartrack"><div class="barfill bf-grr" style="width:49.1%">49.1</div></div><div class="barval">49.1<s>guided pool</s></div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><h3 style="margin-top:0">Primary · il3_s0</h3><p><strong>guided_rr_exp − exp = −25.58 pp</strong><br/>CI [−27.30; −23.90]</p><p style="font-size:13px;margin:0">Secondary · published: <strong>−18.98 pp</strong>, CI [−20.58; −17.30]. CIs theo sprite, <strong>có điều kiện trên 19 windows này</strong>; không chứng minh khái quát sang windows/scene mới.</p></div>
+      <div class="card"><h3 style="margin-top:0">Không đồng nhất contact với an toàn</h3><p style="font-size:13.5px;margin:0">4.7% thuộc <strong>baseline đã sửa</strong>, không thuộc phương pháp đề xuất. Không matched compute: guidance có backward và chi phí khác reranking. Tỉ lệ zero-contact trên toàn bộ 32 tương lai là chỉ số riêng (<strong>49.7%</strong> cho il3_s0 guided_rr_exp), không phải 100% − mean contact.</p></div>
+    </div>
+    <h3>Geometry · il3_s0 exp → guided_rr_exp</h3>
+    <div class="tw"><table>
+      <thead><tr><th>Chỉ số</th><th class="num">exp</th><th class="num">guided_rr_exp</th><th>Diễn giải đúng</th></tr></thead>
+      <tbody>
+        <tr><td>Lateral deviation, tham chiếu pool mean</td><td class="num">0.66 m</td><td class="num">1.36 m</td><td>Dịch ngang lớn hơn; cần kiểm tra feasibility</td></tr>
+        <tr><td>Tỉ lệ lateral deviation &gt;1 m</td><td class="num">10.8%</td><td class="num">91.6%</td><td>Không phải bằng chứng vi phạm corridor</td></tr>
+        <tr><td>Origin-inclusive turn</td><td class="num">18.8°</td><td class="num">34.0°</td><td>Góc quay tăng; chưa phải đánh giá comfort đầy đủ</td></tr>
+        <tr><td>Endpoint norm / driver</td><td class="num">0.919</td><td class="num">0.945</td><td>Chuẩn endpoint, <strong>không phải progress</strong></td></tr>
+      </tbody>
+    </table></div>
+    <div class="note note-a"><span class="ni">▲</span><div><strong>Hai tham chiếu khác nhau:</strong> energy so mỗi candidate với <strong>unguided counterpart của chính nó</strong>; lateral metric dùng <strong>pool mean</strong>. Vì vậy không được suy ra corridor violation từ lateral &gt;1 m. Cần đo drivable feasibility, dynamics, comfort và goal progress trực tiếp trước khi chấp nhận mức contact thấp.</div></div>
+  </div>
+</section>
+
+<!-- ============ 5. SIGNIFICANCE ============ -->
+<section class="slide" id="sig">
+  <div class="wrap">
+    <div class="snum">05 — Ý nghĩa</div>
+    <h2>Kết quả này nói lên điều gì — và không nói lên điều gì</h2>
+
+    <div class="grid-2">
+      <div class="card" style="border-left:4px solid var(--teal)">
+        <h3 style="margin-top:0;color:var(--teal)">Có thể khẳng định</h3>
+        <ul class="chk" style="margin-top:12px">
+          <li>Trong script 44, reranking theo <strong>kỳ vọng rủi ro</strong> giảm contact <em>in-sample</em> từ 53.4% → <strong>25.3%</strong> trên prior yếu. Đây là số in-sample; trên 32 tương lai held-out không dùng để chọn, exp là 30.3% so với 29.1% của point (Δ = +1.2 pp [+0.5; +1.9]).</li>
+          <li>Trong script 44, chênh lệch giữa chọn theo phân phối và chọn theo điểm chỉ xuất hiện ở điều kiện có bất định chuyển động (head-on). Đây là quan sát của một thiết lập, không phải quy luật tổng quát — script 46 lật dấu trên unguided pool.</li>
+          <li>Ở bốn điều kiện tất định của bộ dữ liệu này (vận tốc người = 0), point và exp <strong>trùng khớp hoàn toàn</strong> — kiểm tra sanity cho thấy cơ chế không tự tạo thiên lệch.</li>
+          <li>Exp48 cho thấy baseline <strong>guided_rr_exp</strong> giảm mean contact held-out so với exp: <strong>−25.58 pp</strong> trên il3_s0, CI [−27.30; −23.90]. Đây là baseline repair, không phải phương pháp mới.</li>
+        </ul>
+      </div>
+      <div class="card" style="border-left:4px solid var(--red)">
+        <h3 style="margin-top:0;color:var(--red)">Không thể khẳng định</h3>
+        <ul class="chk x" style="margin-top:12px">
+          <li>Không thể nói "diffusion an toàn hơn" — forecaster <strong>chưa được huấn luyện</strong> trên dữ liệu người thật.</li>
+          <li>Không thể nói "phương pháp đã được kiểm chứng" — toàn bộ là <strong>open-loop proxy</strong>.</li>
+          <li>Không thể nói "CVaR luôn kém hơn kỳ vọng" — unguided rerank có held-out 31.7% vs 30.3%, nhưng guided rerank là 3.6% vs 4.7% ở il3_s0; chưa có kiểm định xác nhận superiority giữa hai guided arms.</li>
+          <li>Không thể nói "đề xuất đạt 4.7%" hay "vượt SocialNav" — 4.7% là baseline repair trên proxy, khác thang đo closed-loop.</li>
+          <li>Không thể nói "ổn định" — tỉ lệ đổi lựa chọn <strong>75.5%</strong> ở published (script 44) là dấu hiệu cảnh báo; exp48 chưa có kiểm định độ ổn định theo seed/window.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note note-b">
+      <span class="ni">◆</span>
+      <div><strong>Kết luận cập nhật sau exp48:</strong> script46 bác bỏ lợi ích exp so với point trong <strong>unguided pool</strong> của thiết lập này (30.3% vs 29.1%). Exp48 cho thấy sửa pool bằng guidance rồi rerank là baseline mạnh hơn (guided_rr_exp 4.7%). Không suy rộng rằng phân phối luôn vô ích hoặc chỉ có tác dụng khi guidance. Bài toán tiếp theo là <strong>giữ lợi ích contact đồng thời bảo đảm feasibility, comfort, yield và goal progress</strong>; CI hiện có chỉ theo sprite, có điều kiện trên 19 windows.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6. LIMITS ============ -->
+<section class="slide" id="limits">
+  <div class="wrap">
+    <div class="snum">06 — Giới hạn</div>
+    <h2>Mười khoảng trống phải đóng trước khi bảo vệ</h2>
+    <p class="lede">Liệt kê thẳng thắn, kèm mức độ nghiêm trọng và cách xử lý.</p>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:44px">#</th><th style="width:250px">Khoảng trống</th><th>Ảnh hưởng</th><th style="width:110px">Mức độ</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><b>G1</b></td>
+            <td><b>Không có trajectory người thật</b></td>
+            <td>Penn-Fudan chỉ có vị trí tĩnh, không có chuỗi chuyển động theo thời gian. Tương lai người trong script 44 là <strong>nhiễu tổng hợp thủ công</strong> (8 mẫu, seed cố định). Không thể claim "dự báo chuyển động người" từ dữ liệu này.</td>
+            <td><span class="lbl" style="background:var(--red-l);color:var(--red)">Nghiêm trọng</span></td>
+          </tr>
+          <tr>
+            <td><b>G2</b></td>
+            <td><b>Contact là open-loop proxy</b></td>
+            <td>Đo trên đường dự đoán 5 giây, ngưỡng 0,45 m. <strong>Không phải va chạm vật lý</strong>, không có phản hồi từ môi trường. Social navigation bản chất là đóng vòng.</td>
+            <td><span class="lbl" style="background:var(--red-l);color:var(--red)">Nghiêm trọng</span></td>
+          </tr>
+          <tr>
+            <td><b>G3</b></td>
+            <td><b>Hình phương pháp sai so với code</b></td>
+            <td>Hình vẽ ghi <span class="mono">E_drivable</span> và <span class="mono">E_smooth</span>, nhưng <span class="mono">energy()</span> trong 41/43/44 chỉ có <strong>2 số hạng</strong> (va chạm + hành lang ±1 m). Phải sửa hình hoặc cài đặt thêm.</td>
+            <td><span class="lbl" style="background:var(--amber-l);color:var(--amber)">Cao</span></td>
+          </tr>
+          <tr>
+            <td><b>G4</b></td>
+            <td><b>Đánh giá in-sample ở script 44</b></td>
+            <td><span class="mono">ped_realized = ped_futures[:, 1]</span> nằm trong chính 8 tương lai dùng để chọn. Toàn bộ con số 25.3% bị thổi phồng bởi cấu trúc này. Script 46 đo lại trên 32 tương lai held-out: <strong>Δ(exp−pt) = +1.2 pp [+0.5; +1.9]</strong> — đảo dấu.</td>
+            <td><span class="lbl" style="background:var(--red-l);color:var(--red)">Nghiêm trọng</span></td>
+          </tr>
+          <tr>
+            <td><b>G5</b></td>
+            <td><b>Chỉ 1/5 điều kiện có bất định</b></td>
+            <td>Chỉ <span class="mono">ped_headon_3m</span> có vận tốc (0,−1); left/right/static đều (0,0) nên mọi tương lai trùng nhau tuyệt đối (ins ≡ hel). Bằng chứng thực chất: <strong>380 trạng thái / 306 sprite</strong>, không phải 1900 case đa dạng.</td>
+            <td><span class="lbl" style="background:var(--red-l);color:var(--red)">Nghiêm trọng</span></td>
+          </tr>
+          <tr>
+            <td><b>G6</b></td>
+            <td><b>Không "matched compute"</b></td>
+            <td>Guidance = 80 forward + 80 backward; rerank = 80 forward. Cùng số mẫu ≠ cùng chi phí. Không được tuyên bố "ngang ngân sách" khi chưa có timing/FLOPs.</td>
+            <td><span class="lbl" style="background:var(--amber-l);color:var(--amber)">Cao</span></td>
+          </tr>
+          <tr>
+            <td><b>G7</b></td>
+            <td><b>Đầu vào người là trạng thái đặc quyền</b></td>
+            <td><span class="mono">[x, y, vx, vy]</span> lấy trực tiếp từ metadata, không qua perception. Nhãn đúng là "kiểm toán lập kế hoạch open-loop", không phải "an toàn navigation".</td>
+            <td><span class="lbl" style="background:var(--amber-l);color:var(--amber)">Trung bình</span></td>
+          </tr>
+          <tr>
+            <td><b>G8</b></td>
+            <td><b>Nhánh distributional guidance không tồn tại</b></td>
+            <td>Script 44 quảng cáo nhánh này nhưng code chỉ có point guidance. Không được mô tả nó như đã thử.</td>
+            <td><span class="lbl" style="background:var(--amber-l);color:var(--amber)">Trung bình</span></td>
+          </tr>
+          <tr>
+            <td><b>G9</b></td>
+            <td><b>Chưa có closed-loop</b></td>
+            <td>ABot-Navigation renderer chưa chạy được (WSL <span class="mono">E_ACCESSDENIED</span>). Chưa có episode đóng vòng nào. Kết quả hiện tại là open-loop hoàn toàn.</td>
+            <td><span class="lbl" style="background:var(--red-l);color:var(--red)">Nghiêm trọng</span></td>
+          </tr>
+          <tr>
+            <td><b>G10</b></td><td><b>Contact thấp chưa bảo đảm geometry / feasibility</b></td>
+            <td>Exp48: lateral pool-mean 0.66→1.36 m, &gt;1 m 10.8→91.6%, origin-inclusive turn 18.8→34°. Energy dùng unguided counterpart riêng, không dùng pool mean: <strong>không kết luận corridor violation</strong>. Endpoint norm/driver 0.919→0.945 <strong>không phải progress</strong>. Cần ràng buộc drivable/dynamics/yield và đo comfort, goal progress trực tiếp.</td>
+            <td><span class="lbl" style="background:var(--red-l);color:var(--red)">Nghiêm trọng</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 6b. SOCIALNAV COMPARISON ============ -->
+<section class="slide" id="socialnav">
+  <div class="wrap">
+    <div class="snum">06b — Đối chiếu công trình gốc</div>
+    <h2>So với SocialNav gốc (arXiv 2511.21135): khác biệt nào bảo vệ được, khác biệt nào không</h2>
+    <p class="lede">Câu hỏi hội đồng sẽ hỏi đầu tiên: "khác gì bài báo gốc?" Đây là câu trả lời trung thực.</p>
+
+    <div class="tw">
+      <table>
+        <thead><tr><th style="width:150px">Khía cạnh</th><th>SocialNav gốc</th><th>Hướng của chúng tôi</th></tr></thead>
+        <tbody>
+          <tr><td><b>Đối tượng sinh</b></td><td>Phân phối <b>hành động của robot</b> (quỹ đạo robot khả thi)</td><td>Phân phối <b>tương lai của người đi bộ</b></td></tr>
+          <tr><td><b>Biểu diễn</b></td><td>Qwen2.5-VL-3B: polygon vùng đi được, CoT, VQA</td><td>Trạng thái người <span class="mono">[x,y,vx,vy]</span> + nhiễu có cấu trúc</td></tr>
+          <tr><td><b>Sinh hành động</b></td><td>Conditional flow matching trên latent VLM (DiT 12 lớp, chunk 5)</td><td>Flow head của SocialNav + rerank/guidance theo năng lượng</td></tr>
+          <tr><td><b>Tín hiệu xã hội</b></td><td>Học ngầm từ lịch sử thị giác</td><td>Tường minh: E[risk] / CVaR trên phân phối tương lai người</td></tr>
+          <tr><td><b>Đánh giá</b></td><td>Closed-loop CityWalker: SR 86.1, DCR 82.5, SPL 77.4</td><td>Open-loop, proxy tiếp xúc 0.45 m — <b>khác thang đo</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="grid-2" style="margin-top:18px">
+      <div class="card" style="border-left:4px solid var(--teal)">
+        <h3 style="margin-top:0;color:var(--teal)">Đóng góp khả dĩ — chưa kiểm định</h3>
+        <p style="font-size:13.5px;margin:0">Một <strong>lớp rủi ro tường minh trên phân phối tương lai người</strong>, đặt cạnh cơ chế <em>học ngầm</em> ánh xạ thị giác → hành động của SocialNav. Đây là <strong>giả thuyết kiến trúc</strong>: chưa có ablation nhân quả chứng minh nó tạo ra khác biệt hành vi. Nó cũng không phải đóng góp về mô hình sinh.</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--red)">
+        <h3 style="margin-top:0;color:var(--red)">Ba khác biệt KHÔNG bảo vệ được</h3>
+        <ul class="chk x" style="margin:8px 0 0">
+          <li><strong>Động vs tĩnh</strong> — benchmark của họ có spawn 50–100 cm, 1.0 m/s ± 0.2.</li>
+          <li><strong>Xác suất vs tất định</strong> — action model của họ vốn đã ngẫu nhiên, đa phương thức.</li>
+          <li><strong>Generative vs nongenerative</strong> — cả hai đều dùng flow matching.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="note note-r" style="margin-top:16px">
+      <span class="ni">!</span>
+      <div><strong>Số của họ không so sánh trực tiếp được với ta.</strong> DCR/RC là <em>tỉ lệ tuân thủ vùng, có điều kiện thành công</em> (episode thất bại ⇒ 0). Ta đo proxy tiếp xúc 0.45 m trên đường dự đoán 5 giây. Không được đặt cạnh nhau trong cùng một bảng như thể cùng thang đo. MAOE 7.8° là số của bài báo; 9.2° là bản sao của chúng tôi — không được gộp.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 7. VERDICT ============ -->
+<section class="slide" id="verdict">
+  <div class="wrap">
+    <div class="snum">07 — Kết luận</div>
+    <h2>Khuyến nghị với hội đồng</h2>
+
+    <div class="verdict">
+      <div class="vs">
+        <div class="vt">Đánh giá hướng đi</div>
+        <div class="vv">GO</div>
+        <div class="vn">cho phương pháp tiếp theo có ràng buộc feasibility / yield; <strong>NO GO</strong> cho claim đề xuất đạt 4.7%, vượt SocialNav hoặc an toàn xã hội</div>
+      </div>
+      <div class="vb">
+        <p style="margin-bottom:10px"><strong>Tiếp tục với phương pháp feasibility/yield-constrained, lấy guided_rr làm baseline bắt buộc.</strong> Exp48 là sửa baseline, không phải novelty: il3_s0 guided_rr_exp 4.7% vs exp 30.3%, primary −25.58 pp [−27.30; −23.90]; published secondary −18.98 pp [−20.58; −17.30]. Không matched compute.</p>
+        <p style="margin-bottom:10px"><strong>Không công bố lợi ích của chọn lọc theo phân phối trên pool chưa guidance — riêng <code>il3_s0</code>.</strong> Kiểm tra held-out (script 46: 8 tương lai để chọn, 32 để chấm) cho kết quả <em>đảo dấu</em> trên prior này: Δ(exp−pt) = +1.2 pp [+0.5; +1.9], CVaR +2.6 pp [+1.7; +3.5]. Trên <code>published</code> thì ngược lại (Δ = −4.2 pp), nên kết luận phải gắn với prior, không phải phổ quát. Guidance đơn thuần đã giúp một phần (27.2% so với 29.1%), nhưng phần lớn mức giảm đến từ <em>pool được guidance</em> + rerank — và đó là baseline repair, không phải đóng góp phương pháp.</p>
+        <p style="margin-bottom:0"><strong>Phạm vi:</strong> 380 head-on states / 306 sprites / 19 windows, 32 tương lai tổng hợp held-out; CIs theo sprite có điều kiện trên windows. Geometry dịch ngang và góc quay tăng, còn endpoint norm không đo progress. Chưa có closed-loop: không công bố an toàn xã hội hoặc so thắng SocialNav từ các proxy này.</p>
+      </div>
+    </div>
+
+    <h3>Điều kiện để giữ trạng thái GO</h3>
+    <div class="grid-2">
+      <div class="card" style="border-top:3px solid var(--red)">
+        <h4 style="margin-top:0;color:var(--red)">Bắt buộc</h4>
+        <ul class="chk" style="margin-top:10px">
+          <li><strong>Vượt guided_rr baseline trên contact đồng thời feasibility, comfort và goal progress</strong>; không chấp nhận giảm contact bằng quỹ đạo không khả thi hoặc không hoàn thành mục tiêu.</li>
+          <li>Ràng buộc feasibility / yield rõ ràng và kiểm tra dynamics, vùng đi được trực tiếp.</li>
+          <li>Huấn luyện diffusion forecaster trên dữ liệu quỹ đạo người thật</li>
+          <li>Đánh giá forecaster độc lập (ADE/FDE, NLL) trước khi dùng để rerank</li>
+          <li>Đánh giá held-out ≥ 32 tương lai với CI ghép cặp (hạ tầng đã có ở script 46)</li>
+          <li>Chạy closed-loop trên ít nhất một simulator</li>
+        </ul>
+      </div>
+      <div class="card" style="border-top:3px solid var(--amber)">
+        <h4 style="margin-top:0;color:var(--amber)">Nên có</h4>
+        <ul class="chk" style="margin-top:10px">
+          <li>Baseline ngân sách khớp chính xác (cùng K, cùng cost)</li>
+          <li>Kiểm tra khả thi động học sau guidance</li>
+          <li>Bổ sung số hạng năng lượng còn thiếu vào code, hoặc sửa hình</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 8. ROADMAP ============ -->
+<section class="slide" id="roadmap">
+  <div class="wrap">
+    <div class="snum">08 — Lộ trình</div>
+    <h2>Bốn bước, theo thứ tự phụ thuộc</h2>
+    <p class="lede">Không thể đảo thứ tự: mỗi bước tạo ra đầu vào cho bước sau.</p>
+
+    <ol class="steps">
+      <li>
+        <div class="st">Phương pháp mới có ràng buộc feasibility / yield</div>
+        <div class="sd">Đóng băng guided_rr của exp48 làm baseline đã sửa. Thiết kế ràng buộc drivable/dynamics/yield và đo contact, comfort, goal progress trực tiếp. Lateral pool-mean và endpoint norm chỉ là chẩn đoán, không thay thế feasibility hay progress.</div>
+        <div class="sg">Đóng G10 · chỉ GO khi cải thiện contact đồng thời feasibility, comfort, progress so với guided_rr</div>
+      </li>
+      <li>
+        <div class="st">Dữ liệu chuyển động thật + forecaster độc lập</div>
+        <div class="sd">Chuyển từ sprite tĩnh sang chuỗi người thật rồi huấn luyện forecaster; đánh giá ADE/FDE, calibration/NLL khi định nghĩa phù hợp. Pairwise ADE diversity ở exp47b là độ đa dạng candidate, không phải độ chính xác forecast. Tách windows/scene để kiểm tra tổng quát hóa.</div>
+        <div class="sg">Đóng G1, G5 · không đồng nhất 32 futures tổng hợp với 32 scene mới</div>
+      </li>
+      <li>
+        <div class="st">Kiểm định held-out và compute minh bạch</div>
+        <div class="sd">So phương pháp mới với point, exp, guidance và cả ba guided_rr arms. Dùng cùng splits, nhiều seeds, paired CIs và kiểm tra windows mới; công bố timing/FLOPs, không coi cùng K là matched compute. Gate đồng thời: contact, feasibility, comfort, progress.</div>
+        <div class="sg">Đóng G4, G6 · baseline repair không được tính là novelty</div>
+      </li>
+      <li>
+        <div class="st">Closed-loop trên simulator</div>
+        <div class="sd">Đưa vào môi trường đóng vòng để người phản ứng lại robot. Đo success rate, collision rate, thời gian hoàn thành, và mức "khó chịu xã hội". Đây là thước đo cuối cùng.</div>
+        <div class="sg">Đóng G2, G9 · bắt buộc trước mọi tuyên bố social safety; không suy từ proxy sang an toàn thật</div>
+      </li>
+    </ol>
+
+    <div class="note note-a">
+      <span class="ni">▲</span>
+      <div><strong>Rủi ro chính của lộ trình:</strong> bước 1 và 2 phụ thuộc vào việc có dữ liệu quỹ đạo người chất lượng. Nếu không trích được chuỗi chuyển động đủ dài từ hai nguồn hiện có, cần tính đến phương án dùng dataset chuẩn (ETH/UCY, TrajNet) — đây là thay đổi phạm vi, cần báo hội đồng trước.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. SUMMARY ============ -->
+<section class="slide" id="summary">
+  <div class="wrap">
+    <div class="snum">09 — Tóm tắt một trang</div>
+    <h2>Nếu chỉ nhớ ba điều</h2>
+    <div class="grid-3" style="margin-top:20px">
+      <div class="card" style="border-top:3px solid var(--violet)">
+        <div style="font-size:2.4rem;font-weight:800;color:var(--violet);line-height:1;letter-spacing:-2px">01</div>
+        <h3 style="margin-top:8px">Ý tưởng đúng chỗ</h3>
+        <p style="font-size:13.5px;margin:0">Diffusion tạo ra <strong>phân phối</strong>, và phân phối là điều kiện cần để định nghĩa rủi ro đuôi bằng CVaR. Trong mục tiêu huấn luyện của SocialNav không có số hạng riêng cho đuôi phân phối — đây là quan sát đọc được từ mục tiêu, <strong>chưa phải kết luận rằng cả literature bỏ trống</strong>.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--teal)">
+        <div style="font-size:2.4rem;font-weight:800;color:var(--teal);line-height:1;letter-spacing:-2px">02</div>
+        <h3 style="margin-top:8px">Baseline đã sửa</h3>
+        <p style="font-size:13.5px;margin:0">Chọn lọc thuần trên pool chưa guidance <strong>không vượt point</strong> (30.3% vs 29.1%, script46). Nhưng ghép guidance + rerank cho <strong>4.7%</strong> trên il3_s0 held-out (primary −25.58 pp). Đây là <strong>baseline repair, không phải phương pháp mới</strong>, và chưa matched compute.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--amber)">
+        <div style="font-size:2.4rem;font-weight:800;color:var(--amber);line-height:1;letter-spacing:-2px">03</div>
+        <h3 style="margin-top:8px">Điều kiện để đi tiếp</h3>
+        <p style="font-size:13.5px;margin:0">Phương pháp mới phải <strong>thắng guided_rr trên contact đồng thời feasibility, comfort và goal progress</strong>. Geometry hiện tại (lateral 0.66→1.36 m, turn 18.8→34°) chưa chứng minh khả thi; endpoint norm không phải progress. Closed-loop phải có trước claim social safety.</p>
+      </div>
+    </div>
+
+    <div class="note note-t" style="margin-top:24px">
+      <span class="ni">◆</span>
+      <div><strong>Đề nghị cụ thể với hội đồng:</strong> phê duyệt <strong>GO khả thi</strong> cho một phương pháp tiếp theo có ràng buộc feasibility/yield, dùng guided_rr làm baseline bắt buộc; <strong>NO GO</strong> cho mọi claim rằng đề xuất hiện tại đạt 4.7%, vượt SocialNav, hoặc đã chứng minh an toàn xã hội. Mọi số liệu là <strong>open-loop proxy trên tương lai tổng hợp</strong>, CIs theo sprite và có điều kiện trên 19 windows.</div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <b>SocialNav + Diffusion · Báo cáo Hội đồng</b><br/>
+      Nguồn: <span style="font-family:monospace">results_46_heldout.json</span> · <span style="font-family:monospace">results_47b_diversity.json</span> · <span style="font-family:monospace">results_48_guided_rerank.json</span> · <span style="font-family:monospace">raw_48_guided_rerank.npz</span> · <span style="font-family:monospace">manifest_48_guided_rerank.json</span><br/>
+      380 head-on states · 306 sprites · 19 windows · 32 tương lai tổng hợp held-out (không phải scene)<br/>
+      Open-loop proxy; CIs theo sprite, có điều kiện trên các windows này.
+    </div>
+    <div style="text-align:right">
+      <b>26/11/2026</b><br/>
+      NCS · Qcom Lab · VNU-IS
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

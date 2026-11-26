@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản đọc chi tiết — Risk layer trên phân phối tương lai người cho Social Navigation</title>
+<style>
+  :root{
+    --ink:#16191d; --ink2:#3d454e; --ink3:#6b7480;
+    --line:#e2e6ea; --line2:#eef1f4;
+    --bg:#ffffff; --panel:#f8f9fb;
+    --accent:#1b4d89; --accent2:#2f6fb0;
+    --ok:#1a6b45; --okbg:#eaf6ef;
+    --warn:#8a5a10; --warnbg:#fdf4e3;
+    --bad:#8f2020; --badbg:#fbeeee;
+    --mono:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px; line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:880px;margin:0 auto;padding:0 26px 120px}
+
+  /* ---- hero ---- */
+  header.hero{
+    background:linear-gradient(160deg,#101a26 0%,#1b2f47 55%,#24405e 100%);
+    color:#eef3f8; padding:64px 26px 56px; margin-bottom:0;
+  }
+  header.hero .inner{max-width:880px;margin:0 auto}
+  .kicker{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.16em;
+    text-transform:uppercase; color:#8fb4d8; margin-bottom:20px;
+  }
+  header.hero h1{
+    font-size:34px; line-height:1.24; margin:0 0 18px; font-weight:640;
+    letter-spacing:-.01em;
+  }
+  header.hero p.lede{
+    font-size:16.5px; color:#c3d3e2; margin:0 0 26px; max-width:760px; line-height:1.66;
+  }
+  .badges{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:0}
+  .badge{
+    font-family:var(--mono); font-size:11px; letter-spacing:.04em;
+    padding:5px 11px; border-radius:999px; border:1px solid rgba(255,255,255,.24);
+    color:#d5e3f0; background:rgba(255,255,255,.05);
+  }
+  .badge.warn{border-color:rgba(240,190,110,.5);color:#f2d6a4;background:rgba(240,190,110,.09)}
+  .badge.bad{border-color:rgba(240,140,140,.5);color:#f3c0c0;background:rgba(240,140,140,.09)}
+
+  /* ---- reading guide ---- */
+  .guide{background:var(--panel);border-bottom:1px solid var(--line);padding:26px}
+  .guide .inner{max-width:880px;margin:0 auto}
+  .guide h4{margin:0 0 14px;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);font-family:var(--mono)}
+  .guide-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px}
+  .guide-item{border-left:2px solid var(--accent2);padding-left:12px}
+  .guide-item b{display:block;font-size:13px;color:var(--accent);margin-bottom:2px}
+  .guide-item span{font-size:13.5px;color:var(--ink2)}
+
+  /* ---- nav ---- */
+  nav.toc{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.96);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:11px 26px}
+  nav.toc .inner{max-width:880px;margin:0 auto;display:flex;gap:20px;flex-wrap:wrap}
+  nav.toc a{font-size:13px;color:var(--ink3);text-decoration:none;font-weight:520;letter-spacing:.01em}
+  nav.toc a:hover{color:var(--accent)}
+
+  /* ---- typography ---- */
+  h2{
+    font-size:25px;margin:62px 0 8px;font-weight:640;letter-spacing:-.01em;
+    padding-bottom:12px;border-bottom:2px solid var(--ink);
+  }
+  h2 .num{
+    font-family:var(--mono);font-size:13px;color:var(--accent2);
+    display:block;letter-spacing:.14em;margin-bottom:8px;font-weight:600;
+  }
+  h3{font-size:18.5px;margin:38px 0 10px;font-weight:630;letter-spacing:-.005em}
+  h4{font-size:15px;margin:26px 0 8px;font-weight:640}
+  p{margin:0 0 15px}
+  ul,ol{margin:0 0 16px;padding-left:22px}
+  li{margin-bottom:7px}
+  strong{font-weight:640;color:#0f1216}
+  em{font-style:italic}
+  code{font-family:var(--mono);font-size:.875em;background:#f1f4f7;
+    padding:1.5px 5px;border-radius:4px;color:#1f3d5c}
+  a{color:var(--accent2)}
+
+  /* ---- callouts ---- */
+  .call{border-left:3px solid var(--accent2);background:#f6f9fc;
+    padding:16px 20px;margin:22px 0;border-radius:0 6px 6px 0}
+  .call p:last-child{margin-bottom:0}
+  .call .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--accent2);display:block;margin-bottom:6px;font-weight:600}
+  .call.ok{border-left-color:var(--ok);background:var(--okbg)}
+  .call.ok .lbl{color:var(--ok)}
+  .call.warn{border-left-color:#c98a1e;background:var(--warnbg)}
+  .call.warn .lbl{color:var(--warn)}
+  .call.bad{border-left-color:#b03030;background:var(--badbg)}
+  .call.bad .lbl{color:var(--bad)}
+
+  /* ---- tables ---- */
+  .tw{overflow-x:auto;margin:22px 0;border:1px solid var(--line);border-radius:7px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;background:#fff}
+  th{background:#f3f6f9;text-align:left;padding:10px 13px;font-weight:620;
+    border-bottom:1px solid var(--line);color:#25313d;font-size:12.5px;
+    letter-spacing:.01em;vertical-align:bottom}
+  td{padding:9px 13px;border-bottom:1px solid var(--line2);vertical-align:top;line-height:1.55}
+  tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#fafcfd}
+  td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;font-family:var(--mono);font-size:12.5px}
+  .tcap{font-size:12.5px;color:var(--ink3);margin:-12px 0 24px;line-height:1.55}
+
+  /* ---- stat strip ---- */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+    gap:1px;background:var(--line);border:1px solid var(--line);
+    border-radius:7px;overflow:hidden;margin:24px 0}
+  .stat{background:#fff;padding:16px 18px}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:650;color:var(--accent);
+    letter-spacing:-.02em;display:block;line-height:1.2}
+  .stat .v.bad{color:var(--bad)} .stat .v.ok{color:var(--ok)}
+  .stat .k{font-size:12px;color:var(--ink3);margin-top:5px;display:block;line-height:1.45}
+
+  /* ---- flow diagram ---- */
+  .flow{display:flex;flex-direction:column;gap:0;margin:26px 0}
+  .flow-row{display:flex;align-items:stretch;gap:10px}
+  .flow-box{flex:1;border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:#fff}
+  .flow-box .t{font-weight:630;font-size:13.5px;color:var(--ink)}
+  .flow-box .d{font-size:12.5px;color:var(--ink3);margin-top:3px;line-height:1.5}
+  .flow-box.hl{border-color:var(--accent2);background:#f5f9fd;box-shadow:0 0 0 1px #d5e5f4 inset}
+  .flow-box.new{border-color:#c98a1e;background:var(--warnbg)}
+  .flow-box.mute{background:#fafafa;opacity:.85}
+  .arrow{text-align:center;color:var(--ink3);font-size:15px;line-height:1;padding:5px 0}
+
+  /* ---- code ---- */
+  pre{background:#111820;color:#d8e3ee;padding:16px 18px;border-radius:7px;
+    overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.62;margin:20px 0}
+  pre .c{color:#7d93a8}
+  pre .k{color:#8fc7f0}
+  pre .s{color:#a8d8a0}
+
+  .divider{height:1px;background:var(--line);margin:44px 0}
+
+  .verdict-box{border:2px solid var(--ink);border-radius:9px;padding:26px;margin:30px 0;background:#fff}
+  .verdict-box .tag{font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:#fff;background:var(--ink);padding:4px 10px;border-radius:4px;
+    display:inline-block;margin-bottom:14px}
+  .verdict-box .tag.go{background:var(--ok)}
+  .verdict-box .tag.nogo{background:var(--bad)}
+  .verdict-box .tag.cond{background:#8a5a10}
+
+  footer{margin-top:70px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:12.5px;color:var(--ink3);line-height:1.7}
+  footer p{margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="inner">
+    <div class="kicker">Tài liệu đọc nội bộ · 2026-11-26</div>
+    <h1>Risk layer trên phân phối tương lai người<br>cho Social Navigation</h1>
+    <p class="lede">
+      Bản đọc chi tiết: phương pháp đã thực hiện, ý tưởng và vị trí của nó trong kiến trúc
+      SocialNav, kết quả hiện tại kèm những gì còn thiếu, kế hoạch bổ sung dữ liệu chuyển động
+      thật, và kết luận Go / No-Go có điều kiện.
+    </p>
+    <div class="badges">
+      <span class="badge">open-loop proxy</span>
+      <span class="badge warn">tương lai người = tổng hợp</span>
+      <span class="badge bad">closed-loop bị chặn</span>
+      <span class="badge">1.900 trạng thái · hiệu dụng 380 / 306 người</span>
+    </div>
+  </div>
+</header>
+
+<div class="guide">
+  <div class="inner">
+    <h4>Cách đọc tài liệu này</h4>
+    <div class="guide-grid">
+      <div class="guide-item">
+        <b>5 phút — để quyết định</b>
+        <span>Đọc mục 4 (Go/No-Go) và ba hộp cảnh báo trong mục 3.</span>
+      </div>
+      <div class="guide-item">
+        <b>20 phút — để phản biện</b>
+        <span>Mục 1 và mục 3. Đây là phần có thể kiểm tra từng con số.</span>
+      </div>
+      <div class="guide-item">
+        <b>60 phút — để viết bài</b>
+        <span>Toàn bộ, đặc biệt mục 2 (Proposed Method) và mục 3a (dữ liệu).</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<nav class="toc">
+  <div class="inner">
+    <a href="#p1">1 · Phương pháp</a>
+    <a href="#p2">2 · Ý tưởng &amp; Proposed Method</a>
+    <a href="#p3">3 · Kết quả &amp; cái còn thiếu</a>
+    <a href="#p3a">3a · Dữ liệu</a>
+    <a href="#p3b">3b · Còn phù hợp?</a>
+    <a href="#p4">4 · Go / No-Go</a>
+    <a href="#p5">Phụ lục</a>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- ================================================================= -->
+<h2 id="p1"><span class="num">Phần 1</span>Phương pháp đã thực hiện</h2>
+
+<p>
+  Phần này mô tả đúng những gì đã chạy, không mô tả những gì dự định làm. Mọi con số ở đây đều
+  truy được về bốn file kết quả trong <code>Qcom/openloop/</code>. Mục tiêu của phần này là để một
+  người khác có thể dựng lại thí nghiệm và tìm ra chỗ sai.
+</p>
+
+<h3>1.1 Bài toán và thang đo</h3>
+
+<p>
+  Hệ thống nhận một khung hình CityWalker, một quỹ đạo robot khởi đầu, và vị trí/vận tốc của
+  người đi bộ. Nó phải sinh ra quỹ đạo robot 5 giây tới. Trong SocialNav gốc, bước này do một
+  action expert dùng conditional flow matching đảm nhiệm, điều kiện hóa trên latent thị giác của
+  Qwen2.5-VL-3B.
+</p>
+
+<p>
+  Thang đo duy nhất của chúng tôi là <strong>proxy tiếp xúc</strong>: một trạng thái bị tính là
+  tiếp xúc nếu khoảng cách nhỏ nhất giữa đường đi robot và đường đi người trong 5 giây nhỏ hơn
+  <code>CONTACT = 0.45 m</code>. Đây <em>không</em> phải tỉ lệ va chạm thật, và cũng không phải
+  chỉ số của SocialNav. Nó là một đại lượng hình học, đo được, tất định, và — quan trọng nhất —
+  kiểm tra được bằng mắt trên từng case.
+</p>
+
+<div class="call warn">
+  <span class="lbl">Điều kiện tiên quyết để đọc đúng mọi bảng số</span>
+  <p>
+    Đầu vào người đi bộ là bộ bốn <code>[x, y, vx, vy]</code> lấy <strong>trực tiếp từ metadata</strong>
+    của bộ dữ liệu, không qua perception. Nghĩa là hệ thống được trao trạng thái chính xác tuyệt đối.
+    Nhãn trung thực của toàn bộ thực nghiệm là <strong>“kiểm toán lập kế hoạch open-loop với trạng thái
+    đặc quyền tổng hợp”</strong>, không phải “an toàn navigation đã triển khai”.
+  </p>
+</div>
+
+<h3>1.2 Hệ thống đã dựng</h3>
+
+<p>
+  Kiến trúc gồm bốn khối nối tiếp. Khối 1 và 2 là của SocialNav, giữ nguyên. Khối 3 và 4 là phần
+  chúng tôi thêm vào — đây chính là chỗ ý tưởng được cài đặt.
+</p>
+
+<div class="flow">
+  <div class="flow-row">
+    <div class="flow-box mute">
+      <div class="t">① CityWalker frame</div>
+      <div class="d">Ảnh RGB + quỹ đạo robot khởi đầu</div>
+    </div>
+    <div class="flow-box mute">
+      <div class="t">② Flow action expert</div>
+      <div class="d">Sinh 16 quỹ đạo robot ứng viên, 5 bước flow</div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="flow-row">
+    <div class="flow-box new">
+      <div class="t">③ Human-future sampler &nbsp;<span style="font-family:var(--mono);font-size:11px">MỚI</span></div>
+      <div class="d">Sinh N = 8 tương lai người (hiện tại: nhiễu quanh vận tốc không đổi)</div>
+    </div>
+    <div class="flow-box new">
+      <div class="t">④ Risk functional &nbsp;<span style="font-family:var(--mono);font-size:11px">MỚI</span></div>
+      <div class="d">Chấm năng lượng theo kỳ vọng / CVaR / point rồi chọn</div>
+    </div>
+  </div>
+  <div class="arrow">↓</div>
+  <div class="flow-row">
+    <div class="flow-box hl">
+      <div class="t">Quỹ đạo robot được chọn</div>
+      <div class="d">Chấm bằng proxy tiếp xúc 0.45 m + góc quay cực đại + lệch ngang</div>
+    </div>
+  </div>
+</div>
+
+<p>
+  Hàm năng lượng có <strong>đúng hai số hạng</strong>, và điều này quan trọng vì nó giới hạn mọi
+  diễn giải: một số hạng va chạm (khoảng cách tới ngưỡng 0.45 m) và một số hạng lệch ngang
+  (phạt khi đi ra khỏi hành lang ±1 m quanh đường nối). Không có số hạng nào cho tính trơn, cho
+  khả năng lái được, hay cho luật giao thông — dù một số hình minh họa trước đây có vẽ chúng.
+  Nếu bài báo mô tả năng lượng gồm bốn số hạng thì đó là mô tả sai so với code.
+</p>
+
+<h3>1.3 Sáu nhánh chọn hành động</h3>
+
+<p>
+  Từ cùng một tập 16 ứng viên, có sáu cách chọn. Năm cách đầu là các biến thể của cơ chế rủi ro;
+  cách thứ sáu là chọn mù trong ngân sách mẫu, dùng làm mốc so sánh.
+</p>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr><th style="width:104px">Nhánh</th><th>Định nghĩa chính xác</th><th style="width:150px">Trả lời câu hỏi gì</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>ung</code></td><td>Trung bình cộng 16 ứng viên, không dùng thông tin người</td><td>Mốc dưới: không quan tâm người</td></tr>
+    <tr><td><code>pt</code></td><td>Chọn ứng viên có năng lượng thấp nhất trên <em>một</em> tương lai người duy nhất (point forecast)</td><td>Cách làm cổ điển</td></tr>
+    <tr><td><code>exp</code></td><td>Chọn theo năng lượng <strong>kỳ vọng</strong> trên 8 tương lai</td><td>Phân phối có giúp không?</td></tr>
+    <tr><td><code>cvar</code></td><td>Chọn theo năng lượng trung bình của <strong>nửa xấu nhất</strong> trong 8 tương lai</td><td>Rủi ro đuôi có giúp không?</td></tr>
+    <tr><td><code>gui</code></td><td>Không chọn — <em>tối ưu</em> từng ứng viên bằng gradient của năng lượng (guidance), rồi lấy tốt nhất</td><td>Nếu được phép sửa quỹ đạo thì sao?</td></tr>
+    <tr><td><code>rr16</code> / <code>rr16g</code></td><td>Best-of-16 trên pool không dẫn dắt / có dẫn dắt — tức tiêu hết ngân sách 16 mẫu để chọn</td><td>So sánh công bằng về số mẫu</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Sự khác biệt giữa <code>exp</code> và <code>pt</code> là toàn bộ nội dung khoa học của hướng này.
+  Nếu hai nhánh cho kết quả giống nhau thì “dùng phân phối” không mang lại gì; nếu khác nhau thì
+  phân phối đang mang thông tin. <code>cvar</code> là phép thử mạnh hơn: nó không chỉ dùng phân phối,
+  nó <em>chỉ</em> quan tâm đến phần đuôi.
+</p>
+
+<h3>1.4 Giao thức đánh giá — điểm mấu chốt</h3>
+
+<p>
+  Đây là chỗ phiên bản đầu tiên của dự án sai, và là chỗ đáng đọc kỹ nhất.
+</p>
+
+<p>
+  Mỗi trạng thái có 40 tương lai người tổng hợp. Trong thiết kế cuối (script 46), bộ chọn
+  <strong>chỉ được nhìn thấy 8 tương lai đầu</strong> — đúng bằng ngân sách mà script 44 dùng.
+  Ba mươi hai tương lai còn lại <strong>chưa bao giờ được dùng để chọn</strong>, nên chúng là tập test.
+  Cùng một quỹ đạo robot được chọn rồi chấm hai lần: một lần trên tương lai số 1 (giao thức của 44,
+  gọi là <code>ins</code> = in-sample, chỉ để đối chiếu) và một lần trung bình trên 32 tương lai held-out
+  (<code>hel</code>).
+</p>
+
+<p>
+  Khoảng tin cậy không dùng bootstrap thường, mà dùng <strong>bootstrap ghép cặp theo người</strong>
+  trên hiệu <code>hel_a − hel_pt</code>. Lý do: mỗi người đóng góp 1–2 trạng thái, và các trạng thái
+  của cùng một người không độc lập. Bootstrap theo người giữ đúng cấu trúc phụ thuộc; ghép cặp
+  loại bỏ phương sai do khác biệt giữa các người. Estimator là tỉ lệ tổng/tổng, không phải trung bình
+  của các trung bình — đây là lỗi của script 43, đã sửa ở 46.
+</p>
+
+<div class="call">
+  <span class="lbl">Vì sao phải có held-out mới nói được gì</span>
+  <p>
+    Nếu bộ chọn được nhìn thấy chính tương lai mà nó sẽ bị chấm, nó sẽ chọn quỹ đạo né đúng cái
+    tương lai đó. Con số thu được khi đó là <em>khả năng của bộ chọn phản ứng với thông tin</em>,
+    không phải <em>giá trị của thông tin trong điều kiện thực</em>. Cả hai đều là câu hỏi hợp lệ,
+    nhưng held-out chỉ hỗ trợ suy luận trong phân phối tương lai tổng hợp đang xét; chưa đủ để tuyên bố an toàn thực.
+  </p>
+</div>
+
+<h3>1.5 Những gì là giả lập</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th style="width:190px">Thành phần</th><th style="width:110px">Trạng thái</th><th>Hệ quả lên kết luận</th></tr></thead>
+  <tbody>
+    <tr><td>Khung nền CityWalker</td><td>Thật</td><td>Hình học cảnh đúng như benchmark</td></tr>
+    <tr><td>Sprite người đi bộ</td><td>Thật (Penn-Fudan)</td><td>Ngoại hình người thật, 306 sprite</td></tr>
+    <tr><td>Vị trí / vận tốc người</td><td>Metadata, chính xác tuyệt đối</td><td>Không có nhiễu perception — kết quả là <em>upper bound</em></td></tr>
+    <tr><td>Tương lai người</td><td><strong>Tổng hợp</strong></td><td>Nhiễu quanh vận tốc không đổi. Không có forecaster nào được huấn luyện.</td></tr>
+    <tr><td>Đánh giá</td><td>Open-loop</td><td>Robot không tương tác lại với người; người không phản ứng với robot</td></tr>
+    <tr><td>Chỉ số</td><td>Proxy hình học 0.45 m</td><td>Không so sánh trực tiếp được với SR/RC/SPL của SocialNav</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p class="tcap">
+  Bảng này nên xuất hiện nguyên vẹn trong bài báo. Mỗi dòng là một chỗ người phản biện sẽ hỏi,
+  và trả lời trước thì mạnh hơn bị hỏi sau.
+</p>
+
+<h3>1.6 Vì sao chỉ một phần năm điều kiện có ý nghĩa</h3>
+
+<p>
+  Đây là phát hiện phương pháp quan trọng nhất của giai đoạn này, và nó không đến từ mô hình mà
+  đến từ việc đọc dữ liệu.
+</p>
+
+<p>
+  Năm điều kiện của pilot là <code>headon_3m</code>, <code>left_3m</code>, <code>right_3m</code>,
+  <code>static_2m</code>, <code>static_3m</code>. Tôi mở trực tiếp <code>states_pf.json</code> và đếm
+  số giá trị vận tốc khác nhau trong từng điều kiện:
+</p>
+
+<div class="tw">
+<table>
+  <thead><tr><th>Điều kiện</th><th class="num">Số trạng thái</th><th class="num">Số vận tốc phân biệt</th><th>Vận tốc</th><th>Có bất định chuyển động?</th></tr></thead>
+  <tbody>
+    <tr><td><code>ped_headon_3m</code></td><td class="num">380</td><td class="num">1</td><td><code>(0, −1)</code></td><td><strong>Có</strong> (nhưng chỉ một hướng)</td></tr>
+    <tr><td><code>ped_left_3m</code></td><td class="num">380</td><td class="num">1</td><td><code>(0, 0)</code></td><td>Không</td></tr>
+    <tr><td><code>ped_right_3m</code></td><td class="num">380</td><td class="num">1</td><td><code>(0, 0)</code></td><td>Không</td></tr>
+    <tr><td><code>ped_static_2m</code></td><td class="num">380</td><td class="num">1</td><td><code>(0, 0)</code></td><td>Không</td></tr>
+    <tr><td><code>ped_static_3m</code></td><td class="num">380</td><td class="num">1</td><td><code>(0, 0)</code></td><td>Không</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  Hàm <code>sample_ped_futures</code> chỉ thêm nhiễu khi <code>is_moving &gt; 0.1</code>. Với bốn
+  điều kiện vận tốc bằng không, mọi tương lai giống hệt nhau — nên <code>ins</code> và <code>hel</code>
+  trùng khít tuyệt đối, đúng như log ghi. Hệ quả: bất kỳ tuyên bố nào kiểu “qua cả năm điều kiện”
+  đều không có cơ sở. Bằng chứng thật về bất định chuyển động chỉ đến từ <strong>380 trạng thái
+  head-on trên 306 sprite</strong> — và chúng phụ thuộc nền dùng chung, nên cỡ mẫu hiệu dụng còn nhỏ hơn.
+</p>
+
+<!-- ================================================================= -->
+<h2 id="p2"><span class="num">Phần 2</span>Ý tưởng và Proposed Method</h2>
+
+<p>
+  Phần này là phần để viết vào bài. Nó gồm ba việc: mô tả cơ chế của SocialNav đủ chính xác để
+  chỉ ra chỗ trống, xác định chính xác chỗ chèn, và nói rõ phần nào được cải thiện — kèm phần nào
+  không.
+</p>
+
+<h3>2.1 SocialNav thực sự làm gì</h3>
+
+<p>
+  Cần nói chính xác, vì mô tả sai sẽ khiến toàn bộ tuyên bố novelty sụp.
+</p>
+
+<div class="tw">
+<table>
+  <thead><tr><th style="width:150px">Thành phần</th><th>Nội dung (theo arXiv 2511.21135v2)</th></tr></thead>
+  <tbody>
+    <tr><td>Bài toán</td><td>Điều hướng xã hội closed-loop trên CityWalker; robot đi tới goal giữa người</td></tr>
+    <tr><td>Brain</td><td>Qwen2.5-VL-3B sinh polygon vùng đi được, chain-of-thought, VQA</td></tr>
+    <tr><td>Action expert</td><td>Conditional flow matching sinh quỹ đạo robot. DiT 12 lớp / 12 head / hidden 1536; action dim 2; chunk 5; 5 bước flow</td></tr>
+    <tr><td>Học tăng cường</td><td>SAFE-GRPO biến ODE của flow thành SDE để lấy exploration, chỉ tối ưu action expert</td></tr>
+    <tr><td>Open-loop</td><td>CityWalker MAOE <strong>7.8°</strong> (bài báo) — bản sao của chúng tôi: 9.2°</td></tr>
+    <tr><td>Closed-loop</td><td>9 cảnh chưa thấy / 180 case: SR 86.1 · RC 91.2 · SPL 77.4 · DCR 82.5 · TCR 82.9</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="call bad">
+  <span class="lbl">Ba tuyên bố không được phép dùng</span>
+  <p>
+    <strong>(1) “động vs tĩnh”</strong> — benchmark của họ có spawn cách nhau 50–100 cm, tới 6 người
+    trên 100 m, tốc độ 1.0 m/s ± 0.2. Người của họ có chuyển động.<br>
+    <strong>(2) “xác suất vs tất định”</strong> — action model của họ vốn đã ngẫu nhiên (flow matching + SDE).<br>
+    <strong>(3) “generative vs nongenerative”</strong> — cả hai đều generative.<br>
+    Dùng ba tuyên bố này sẽ bị phản biện ngay ở vòng một.
+  </p>
+</div>
+
+<h3>2.2 Khoảng trống trong mục tiêu: họ tối ưu kỳ vọng, không tối ưu đuôi</h3>
+
+<p>
+  Đây là lập luận trung tâm, và nó đứng vững trong phạm vi hẹp: nó nói về <em>thứ được tối ưu</em>,
+  không nói về kiến trúc, và không nói rằng toàn bộ literature bỏ trống câu hỏi này.
+</p>
+
+<p>
+  SocialNav học một ánh xạ từ lịch sử thị giác sang phân phối hành động robot. Khi huấn luyện bằng
+  imitation learning, nó cực đại hóa khả năng của hành động đúng — tức học <em>mode</em> của phân phối.
+  Khi tinh chỉnh bằng SAFE-GRPO, nó cực đại hóa <em>kỳ vọng</em> của reward. Cả hai đều là các
+  hàm của trung bình. Không có số hạng nào trong mục tiêu huấn luyện tham chiếu tới phần đuôi của
+  phân phối tương lai người — đơn giản vì mô hình không có biểu diễn tường minh nào cho phân phối đó.
+</p>
+
+<p>
+  Với một robot, điều này có hệ quả cụ thể. Hai kịch bản có cùng kỳ vọng khoảng cách có thể rất khác
+  nhau về rủi ro: một kịch bản mà người đi thẳng và robot né được, và một kịch bản mà người có thể
+  rẽ trái hoặc rẽ phải với xác suất bằng nhau — trong trường hợp thứ hai, kỳ vọng vẫn ổn nhưng
+  tồn tại một nhánh dẫn tới tiếp xúc. Một mục tiêu chỉ nhìn kỳ vọng không phân biệt được hai
+  trường hợp này. Một hàm của đuôi thì phân biệt được.
+</p>
+
+<div class="call ok">
+  <span class="lbl">Khác biệt cơ chế khả dĩ — chưa kiểm định nhân quả</span>
+  <p>
+    <strong>Một lớp rủi ro tường minh trên phân phối tương lai người</strong> (sinh N tương lai →
+    định lượng kỳ vọng/CVaR → chọn hành động) <strong>đặt cạnh</strong> việc SocialNav học ngầm
+    ánh xạ lịch sử thị giác → hành động robot. Đây là khác biệt về <em>đối tượng được mô hình hóa</em>,
+    không phải về kiến trúc mạng.
+  </p>
+</div>
+
+<h3>2.3 Ánh xạ vào kiến trúc: ba điểm chèn</h3>
+
+<p>
+  Cùng một ý tưởng có ba cách cài đặt, khác nhau rất nhiều về chi phí và về độ mạnh của tuyên bố
+  có thể đưa ra. Chúng tôi mới làm cách A. Cách B và C là phần đề xuất thực sự.
+</p>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr><th style="width:52px">Cách</th><th style="width:190px">Chèn ở đâu</th><th>Cần huấn luyện lại?</th><th style="width:120px">Tuyên bố tối đa</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>A</strong></td>
+      <td>Sau action expert, như một reranker trên 16 ứng viên</td>
+      <td>Không</td>
+      <td>“Cơ chế khả thi”</td>
+    </tr>
+    <tr>
+      <td><strong>B</strong></td>
+      <td>Điều kiện hóa action expert trên mức rủi ro <code>q</code> của phân phối tương lai người</td>
+      <td>Có — tinh chỉnh action expert</td>
+      <td>“Phân phối hành động dịch chuyển theo rủi ro”</td>
+    </tr>
+    <tr>
+      <td><strong>C</strong></td>
+      <td>Thay reward của SAFE-GRPO bằng một hàm đuôi (CVaR) trên các tương lai người được lấy mẫu</td>
+      <td>Có — RL</td>
+      <td>“Tối ưu trực tiếp rủi ro đuôi”</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h4>Cách A — điều đã chạy, và giới hạn của nó</h4>
+
+<p>
+  Giữ nguyên 16 ứng viên, chấm điểm bằng năng lượng phụ thuộc tương lai người, chọn. Ưu điểm: không
+  cần GPU để huấn luyện, kiểm tra được từng case, và cô lập được đúng một biến — <em>thông tin về
+  phân phối tương lai có làm thay đổi quyết định không</em>.
+</p>
+
+<p>
+  Nhược điểm mang tính nguyên lý: rerank chỉ chọn trong những gì flow model đã sinh. Nếu mọi ứng viên
+  đều đi qua vùng nguy hiểm, rerank không cứu được. Đây chính là lý do nhánh <code>gui</code>
+  (tối ưu trực tiếp từng ứng viên) lại là nhánh duy nhất cải thiện được trên held-out. Nó không
+  chọn tốt hơn — nó <em>thay đổi</em> ứng viên.
+</p>
+
+<h4>Cách B — đề xuất chính</h4>
+
+<p>
+  Thay vì chọn sau, đưa rủi ro vào điều kiện. Cụ thể: từ 8 tương lai người, tính một vector đặc trưng
+  rủi ro <code>r = [E[d_min], CVaR_α(d_min), σ_d, τ_time_to_closest]</code>, rồi nối vào điều kiện
+  của flow model cùng với latent thị giác. Khi huấn luyện, lấy mẫu <code>α</code> ngẫu nhiên để mô
+  hình học được cả họ phân phối chứ không chỉ một điểm vận hành.
+</p>
+
+<p>
+  Ưu điểm so với A: phân phối hành động <em>dịch chuyển</em>, nên những quỹ đạo “không tồn tại
+  trong 16 mẫu” vẫn có thể được sinh ra. Đây là khác biệt về chất, không phải về lượng.
+</p>
+
+<h4>Cách C — đề xuất mạnh nhất, và rủi ro nhất</h4>
+
+<p>
+  SAFE-GRPO đã biến flow ODE thành SDE để lấy exploration. Điều đó có nghĩa: tại mỗi bước, mô hình
+  đã lấy mẫu hành động. Chỉ cần thay reward <code>R</code> bằng một hàm đuôi trên các tương lai người
+  được lấy mẫu trong cùng episode. Về mặt kỹ thuật, đây là thay đổi nhỏ nhất trong ba cách — nhưng
+  nó đòi hỏi một forecaster đủ tốt, vì reward nhiễu sẽ làm RL phân kỳ.
+</p>
+
+<div class="call warn">
+  <span class="lbl">Thứ tự thực hiện không được đảo</span>
+  <p>
+    C không thể làm trước B, và B không thể làm trước khi có forecaster thật. Lý do: cả hai đều dùng
+    phân phối tương lai như <em>đầu vào huấn luyện</em>. Nếu phân phối đó là nhiễu nhân tạo quanh
+    vận tốc không đổi, mô hình sẽ học cách tối ưu một phân phối không tồn tại — và kết quả sẽ không
+    chuyển được sang dữ liệu thật. Đây không phải lo xa: kết quả ở phần 3 là bằng chứng trực tiếp.
+  </p>
+</div>
+
+<h3>2.4 Cải thiện phần nào — và không cải thiện phần nào</h3>
+
+<h4>Bốn thứ được cải thiện, có cơ chế rõ ràng</h4>
+
+<div class="tw">
+<table>
+  <thead><tr><th style="width:150px">Khía cạnh</th><th>Cơ chế</th><th style="width:170px">Đo bằng gì</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Kiểm toán được</td>
+      <td>Rủi ro là một con số ghi ra được, ngưỡng hóa được, log lại được. SocialNav không có con số này.</td>
+      <td>Sự tồn tại của <code>r</code> trong log</td>
+    </tr>
+    <tr>
+      <td>Núm điều chỉnh độ thận trọng</td>
+      <td><code>α</code> của CVaR cho một họ chính sách từ lạc quan đến bảo thủ, kèm đường cong chi phí</td>
+      <td>Đường cong turn-angle theo <code>α</code></td>
+    </tr>
+    <tr>
+      <td>Thay forecaster không cần huấn luyện lại</td>
+      <td>Tách rời mô hình người khỏi mô hình robot</td>
+      <td>Chạy cùng pipeline với 2 forecaster khác nhau</td>
+    </tr>
+    <tr>
+      <td>Chẩn đoán lỗi</td>
+      <td>Tách “không thấy người” khỏi “thấy nhưng không hành động”</td>
+      <td>So tiếp xúc có/không có người</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h4>Bốn thứ không được cải thiện, và phải nói ra</h4>
+
+<ul>
+  <li><strong>Hiệu quả mẫu.</strong> Thêm N tương lai là thêm N lần chi phí. Không có bằng chứng nào cho thấy nó tiết kiệm hơn.</li>
+  <li><strong>Tỉ lệ thành công thô.</strong> Chưa có phép đo nào cho thấy SR tăng. Chỉ số duy nhất chúng tôi có là proxy tiếp xúc.</li>
+  <li><strong>Chi phí tính toán.</strong> Script 43 là 80 forward + 80 backward so với 80 forward của rerank thường — cùng số mẫu, khác chi phí. Chưa đo FLOPs hay thời gian.</li>
+  <li><strong>Khả năng mô hình hóa tương tác.</strong> Open-loop: robot không ảnh hưởng tới người. Trong thực tế, người sẽ né robot — và đó là phần lớn khó khăn.</li>
+</ul>
+
+<!-- ================================================================= -->
+<h2 id="p3"><span class="num">Phần 3</span>Kết quả hiện tại và những gì còn thiếu</h2>
+
+<p>
+  Chuỗi kiểm toán từ 41 đến 48 trả lời các câu hỏi khác nhau. Đọc theo thứ tự này vì mỗi cái sửa một lỗi của cái trước.
+  Hai script cuối (47b, 48) là hai lần kiểm toán độc lập mà trước đây chưa có: một cái hỏi pool ứng viên robot có
+  bị sụp đổ mode không, một cái hỏi guidance có hơn baseline rerank cùng ngân sách không.
+</p>
+
+<div class="tw">
+<table>
+  <thead><tr><th style="width:64px">Script</th><th style="width:180px">Câu hỏi</th><th style="width:130px">Trạng thái</th><th>Kết quả một dòng</th></tr></thead>
+  <tbody>
+    <tr><td>41</td><td>Guidance có làm giảm tiếp xúc?</td><td>Hoàn tất</td><td>66.5% → 14.8% trên prior yếu. Có, nhưng in-sample.</td></tr>
+    <tr><td>42</td><td>Closed-loop thì sao?</td><td><strong>Bị chặn</strong></td><td>WSL <code>E_ACCESSDENIED</code>, không có render server ở <code>127.0.0.1:7036</code>. Không chạy được.</td></tr>
+    <tr><td>43</td><td>Trong ngân sách 16 mẫu, chọn theo phân phối có hơn chọn mù?</td><td>Hoàn tất</td><td>Có, nhưng kết quả oracle-advantaged và trộn hai estimand.</td></tr>
+    <tr><td>44</td><td>Kỳ vọng và CVaR có hơn point forecast?</td><td>Hoàn tất</td><td>25.3% so với 28.9%. Nhưng <strong>in-sample</strong>.</td></tr>
+    <tr><td>45</td><td>(bản v1 của held-out)</td><td><strong>Bỏ</strong></td><td>Lỗi: held-7 suy biến thành held-1 và đổi tham chiếu năng lượng. Không trích dẫn.</td></tr>
+    <tr><td>46</td><td>Held-out đúng nghĩa thì sao?</td><td>Hoàn tất</td><td><strong>Đảo dấu.</strong> Đây là kết quả quyết định.</td></tr>
+    <tr><td>47</td><td>Nếu cấp vận tốc thật thì sao?</td><td><strong>Debug, không dùng</strong></td><td>Counterfactual oracle velocity, lịch sử 5 frame tĩnh không khớp vận tốc gán. Không phải bằng chứng nhận thức.</td></tr>
+    <tr><td>47b</td><td>Pool ứng viên có bị mode collapse?</td><td>Hoàn tất</td><td>Pairwise ADE giữa ứng viên 0,325 m (published) / 0,499 m (il3_s0), trùng lặp 0,8% / 0,1%. Đây là độ đa dạng, không phải sai số dự báo người. Schema2 thay thế bản lỗi metric đầu tiên.</td></tr>
+    <tr><td>48</td><td>Nếu so với baseline rerank <em>cùng giao thức</em>?</td><td>Hoàn tất</td><td><strong>Guidance thắng lớn về tiếp xúc</strong> (−25,6 pp) <strong>nhưng mua bằng lệch ngang ~2×</strong>. Đây là kết quả phải trích dẫn.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>3.1 Kết quả quyết định</h3>
+
+<p>
+  Script 46, prior yếu <code>il3_s0</code>, điều kiện head-on 3 m — đúng điều kiện duy nhất mà
+  script 44 tuyên bố có lợi. Đơn vị: phần trăm trạng thái có tiếp xúc, CI 95% ghép cặp theo người.
+</p>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr>
+      <th>Nhánh</th><th class="num">in-sample<br>(tương lai 1)</th><th class="num">held-out<br>(32 tương lai)</th>
+      <th class="num">Δ so với point</th><th class="num">Kết luận</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td><code>pt</code> — point forecast</td><td class="num">28.9</td><td class="num">29.1 [27.2, 31.1]</td><td class="num">—</td><td>Mốc</td></tr>
+    <tr><td><code>exp</code> — kỳ vọng</td><td class="num">25.3</td><td class="num"><strong>30.3</strong> [28.3, 32.3]</td><td class="num"><strong>+1.2 [+0.5, +1.9]</strong></td><td style="color:#8f2020"><strong>Tệ hơn, có ý nghĩa</strong></td></tr>
+    <tr><td><code>cvar</code> — nửa xấu nhất</td><td class="num">—</td><td class="num">—</td><td class="num"><strong>+2.6 [+1.7, +3.5]</strong></td><td style="color:#8f2020"><strong>Tệ hơn nữa</strong></td></tr>
+    <tr><td><code>gui</code> — guidance</td><td class="num">14.8</td><td class="num">—</td><td class="num">−1.9 [−3.3, −0.4]</td><td style="color:#1a6b45">Tốt hơn, nhưng không phải cơ chế phân phối</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="call bad">
+  <span class="lbl">Đọc đúng dòng thứ hai</span>
+  <p>
+    Trên 32 tương lai chưa từng dùng để chọn, <strong>kỳ vọng tệ hơn point forecast 1.2 điểm phần trăm</strong>,
+    và CVaR tệ hơn 2.6 — cả hai đều có ý nghĩa thống kê với CI không chứa 0.
+    Con số 25.3% mà giai đoạn trước báo cáo là <em>in-sample</em>: nó là khả năng phản ứng với thông tin,
+    không phải giá trị của thông tin. Ngay CI in-sample của nó cũng chỉ 21.1–29.2, tức ±4 điểm.
+  </p>
+</div>
+
+<p>
+  Cơ chế của sự đảo dấu này rất cụ thể: khi bộ chọn được nhìn tương lai số 1, nó chọn quỹ đạo né
+  đúng hướng đó. Khi bị chấm trên 32 hướng khác, quỹ đạo ấy hóa ra đã đi vào vùng mà nhiều hướng
+  khác cũng cắt qua. Point forecast trung tính hơn nên ít bị phạt hơn. Nói cách khác:
+  <strong>tối ưu cho một mẫu là một dạng overfit</strong>.
+</p>
+
+<h3>3.2 Nghịch lý ở prior mạnh</h3>
+
+<p>
+  Trên prior <code>published</code>, Δ(exp−pt) = −4.2 [−5.2, −3.3] với flip rate 75.5% — nghĩa là
+  75.5% trạng thái đổi quyết định khi chuyển từ point sang kỳ vọng, và phần lớn đổi theo hướng tốt.
+  Nghe như kết quả tích cực. Nhưng mức tuyệt đối vẫn là 66.1% và 70.3% tiếp xúc. Đây là cải thiện
+  <em>trong vùng thảm họa</em>, không phải an toàn. Và script 43 cho thấy ngay cả guidance có
+  dẫn dắt cũng chỉ đưa prior này về 71.6%.
+</p>
+
+<p>
+  Trước 48, tỷ lệ tiếp xúc cao gợi ý cần can thiệp quá trình sinh thay vì chỉ chọn lại ứng viên.
+  Script 48 kiểm tra trực tiếp giả thuyết này: guided rerank giảm tiếp xúc ở cả hai prior.
+  Do đó không kết luận prior đã “bão hòa” hay không thể cải thiện; câu hỏi còn lại là đánh đổi
+  giữa tiếp xúc và tính khả thi, cùng khả năng khái quát sang dữ liệu chuyển động thật.
+</p>
+
+<h3>3.3 Đối chứng cùng giao thức — script 48</h3>
+
+<p>
+  Script 46 trả lời “kỳ vọng có hơn point forecast không”. Nó <em>không</em> trả lời câu hỏi mà hội đồng
+  sẽ hỏi ngay: <strong>guidance có hơn một baseline rerank tầm thường cùng ngân sách không?</strong>
+  Script 48 dựng đúng phép so đó, trên cùng 380 trạng thái head-on, cùng 32 tương lai held-out, cùng
+  ngân sách 16 ứng viên.
+</p>
+
+<div class="tw">
+<table>
+  <caption>Bảng 3.3. Tiếp xúc head-on trên tương lai held-out (%) — 380 trạng thái, 306 sprite, 19 cửa sổ</caption>
+  <thead>
+    <tr><th>Nhánh</th><th class="num">prior <code>published</code></th><th class="num">prior <code>il3_s0</code></th><th>Bản chất</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>ung</code></td><td class="num">74.1</td><td class="num">53.4</td><td>Không guidance, không chọn</td></tr>
+    <tr><td><code>pt</code></td><td class="num">70.3</td><td class="num">29.1</td><td>Chọn theo point forecast — baseline</td></tr>
+    <tr><td><code>exp</code></td><td class="num">66.1</td><td class="num">30.3</td><td>Chọn theo kỳ vọng</td></tr>
+    <tr><td><code>cvar</code></td><td class="num">67.5</td><td class="num">31.7</td><td>Chọn theo nửa xấu nhất</td></tr>
+    <tr><td><code>gui</code></td><td class="num">62.1</td><td class="num">27.2</td><td>Guidance, không chọn</td></tr>
+    <tr><td><code>guided_rr_pt</code></td><td class="num">45.8</td><td class="num">4.3</td><td>Guidance + chọn theo point</td></tr>
+    <tr><td><code>guided_rr_exp</code></td><td class="num"><strong>47.1</strong></td><td class="num"><strong>4.7</strong></td><td>Guidance + chọn theo kỳ vọng</td></tr>
+    <tr><td><code>guided_rr_cvar</code></td><td class="num">49.1</td><td class="num">3.6</td><td>Guidance + chọn theo nửa xấu nhất</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="tcap">
+  CI là bootstrap có điều kiện theo sprite (2.000 lần), <strong>chỉ có hiệu lực trên 19 cửa sổ của một
+  trajectory</strong>. 32 tương lai mỗi trạng thái là tương lai tổng hợp, không phải 32 cảnh độc lập.
+</p>
+
+<div class="tw">
+<table>
+  <caption>Bảng 3.4. Các đối chiếu chính, script 48</caption>
+  <thead>
+    <tr><th style="width:250px">Đối chiếu</th><th class="num" style="width:120px">Δ (điểm %)</th><th class="num" style="width:170px">CI 95%</th><th>Vai trò</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><code>il3_s0</code>: guided_rr_exp − exp</td>
+      <td class="num"><strong>−25.58</strong></td>
+      <td class="num"><strong>[−27.30, −23.90]</strong></td>
+      <td><strong>PRIMARY</strong> — phép so quyết định</td>
+    </tr>
+    <tr><td><code>il3_s0</code>: guided_rr_pt − pt</td><td class="num">−24.79</td><td class="num">[−26.47, −23.13]</td><td>Nominal</td></tr>
+    <tr><td><code>published</code>: guided_rr_exp − exp</td><td class="num"><strong>−18.98</strong></td><td class="num">[−20.58, −17.30]</td><td>Secondary, prior mạnh</td></tr>
+    <tr><td><code>published</code>: guided_rr_pt − pt</td><td class="num">−24.51</td><td class="num">[−26.07, −23.08]</td><td>Secondary</td></tr>
+    <tr><td><code>il3_s0</code>: guided_rr_cvar − cvar</td><td class="num">−28.06</td><td class="num">[−30.00, −26.02]</td><td>Exploratory</td></tr>
+    <tr><td><code>il3_s0</code>: guided_rr_exp − guided_rr_pt</td><td class="num">+0.39</td><td class="num">[−0.02, +0.78]</td><td>Exploratory — CI chứa 0</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="call">
+  <span class="lbl">Đọc đúng bảng này</span>
+  <p>
+    Trên <code>il3_s0</code>, guidance + chọn lọc đưa tiếp xúc từ 30,3% xuống 4,7% — giảm 25,6 điểm phần
+    trăm, CI có điều kiện không chứa 0. Đây là <strong>bằng chứng trong bộ kiểm toán hiện tại</strong> rằng guidance
+    không phải trang trí. Nhưng ba điều phải nói cùng lúc:
+  </p>
+  <p style="margin-bottom:0">
+    <strong>(1)</strong> Đây là <em>baseline repair</em> (sửa baseline), không phải phương pháp mới:
+    script 43 đã có một bản rerank có guidance trong ngân sách 16 mẫu, chỉ khác là in-sample. Đóng góp
+    của 48 là <strong>ô held-out khớp giao thức</strong>, không phải kiến trúc mới.
+    <strong>(2)</strong> Không phải matched compute: guidance là 80 forward + 80 backward, rerank thường
+    là 80 forward.
+    <strong>(3)</strong> Chọn theo kỳ vọng và chọn theo point gần như trùng nhau (−0,02 đến +0,78) —
+    chưa có bằng chứng rõ lợi ích bổ sung của chọn theo kỳ vọng so với point trong bộ này; không phải kiểm định tương đương. Đây là
+    phát hiện phụ quan trọng, và nó làm yếu chứ không làm mạnh luận điểm “phân phối là cốt lõi”.
+  </p>
+</div>
+
+<h3>3.4 Chi phí hình học của việc giảm proxy tiếp xúc</h3>
+
+<p>
+  Con số 4,7% chỉ có nghĩa nếu quỹ đạo vẫn còn hợp lý. Script 48 đo kèm bốn đại lượng hình học trên
+  cùng 380 trạng thái, prior <code>il3_s0</code>:
+</p>
+
+<div class="tw">
+<table>
+  <caption>Bảng 3.5. Đánh đổi hình học — <code>il3_s0</code>, 380 trạng thái head-on</caption>
+  <thead>
+    <tr><th style="width:290px">Đại lượng</th><th class="num"><code>ung</code></th><th class="num"><code>exp</code></th><th class="num"><code>gui</code></th><th class="num"><code>guided_rr_exp</code></th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Lệch ngang tối đa, trung bình (m)</td><td class="num">0.17</td><td class="num">0.66</td><td class="num">0.81</td><td class="num"><strong>1.36</strong></td></tr>
+    <tr><td>% trạng thái lệch ngang &gt; 1 m</td><td class="num">0%</td><td class="num">10.8%</td><td class="num">23.7%</td><td class="num"><strong>91.6%</strong></td></tr>
+    <tr><td>Góc quay tối đa, tính cả gốc (°)</td><td class="num">9.7</td><td class="num">18.8</td><td class="num">23.0</td><td class="num"><strong>34.0</strong></td></tr>
+    <tr><td>Tỉ lệ chuẩn điểm cuối so với driver</td><td class="num">0.940</td><td class="num">0.919</td><td class="num">1.046</td><td class="num">0.945</td></tr>
+    <tr><td>% trạng thái không tiếp xúc với cả 32 tương lai</td><td class="num">0%</td><td class="num">9.7%</td><td class="num">11.6%</td><td class="num"><strong>49.7%</strong></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="call bad">
+  <span class="lbl">Ba cái bẫy khi đọc bảng 3.5</span>
+  <p>
+    <strong>Bẫy 1 — hai tham chiếu khác nhau.</strong> Cột “lệch ngang” đo so với <em>trung bình của cả
+    pool ứng viên chưa guidance</em>, dùng chung cho mọi nhánh. Còn hàm năng lượng <code>energy_single</code>
+    lại phạt lệch ngang so với <em>bản chưa guidance của chính ứng viên đó</em>. Hai tham chiếu khác nhau.
+    Vì vậy 91,6% <strong>không</strong> chứng minh quỹ đạo lao ra khỏi hành lang, và cũng không chứng minh
+    hàm mục tiêu bị vô hiệu. Nó chỉ nói: so với mức trung bình của pool, quỹ đạo được chọn đi xa hơn.
+  </p>
+  <p>
+    <strong>Bẫy 2 — tỉ lệ chuẩn điểm cuối không phải tiến độ.</strong> Nó là tỉ lệ độ dài vector điểm cuối
+    so với driver. Script 48 không lưu độ dài đường đi, tỉ lệ thành công, hay timeout. Không được suy ra
+    “đi đúng hướng” hay “bị đứng yên” từ con số 0,945.
+  </p>
+  <p style="margin-bottom:0">
+    <strong>Bẫy 3 — 49,7% không tiếp xúc không phải thành công.</strong> Nếu quỹ đạo đi vòng quá xa, nó
+    cũng “không tiếp xúc”. Đây chính là lý do lỗ hổng #6 tồn tại: chưa có hàm mục tiêu nào đồng thời
+    giữ tiếp xúc thấp <em>và</em> giữ hành lang.
+  </p>
+</div>
+
+<p>
+  Kết luận trung thực: giảm proxy tiếp xúc bằng guidance đi kèm <strong>lệch ngang gấp đôi và 91,6% trạng thái lệch
+  hơn 1 m</strong> so với tham chiếu pool. Đây là một đánh đổi có thể chấp nhận hoặc không, nhưng nó
+  phải được báo cáo, không được giấu. Và nó định nghĩa luôn bước tiếp theo: mục tiêu phải là
+  <em>tiếp xúc thấp + khả thi + tiến đúng hướng</em>, không phải chỉ tiếp xúc thấp.
+</p>
+
+<h3>3.5 Sáu lỗ hổng, xếp theo mức chặn</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th style="width:40px">#</th><th style="width:210px">Lỗ hổng</th><th>Vì sao nó chặn</th><th style="width:110px">Chi phí đóng</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>1</strong></td>
+      <td>Không có forecaster thật</td>
+      <td>Tương lai người là nhiễu quanh vận tốc không đổi. Mọi kết luận về phân phối đang nói về một phân phối tự chế.</td>
+      <td>1–2 tuần</td>
+    </tr>
+    <tr>
+      <td><strong>2</strong></td>
+      <td>Dữ liệu không có bất định chuyển động</td>
+      <td>4/5 điều kiện có vận tốc bằng 0. Cỡ mẫu hiệu dụng là 380 trạng thái / 306 sprite, không phải 1900.</td>
+      <td>3–5 ngày</td>
+    </tr>
+    <tr>
+      <td><strong>3</strong></td>
+      <td>Closed-loop bị chặn</td>
+      <td>Không có render server. Không thể tuyên bố “tốt hơn SocialNav” bằng chính chỉ số của họ.</td>
+      <td>Không xác định</td>
+    </tr>
+    <tr>
+      <td><strong>4</strong></td>
+      <td>Không đo calibration</td>
+      <td>“Phân phối có ích” chỉ có nghĩa nếu phân phối đó hiệu chỉnh đúng. Chưa đo.</td>
+      <td>2 ngày</td>
+    </tr>
+    <tr>
+      <td><strong>5</strong></td><td>Chưa đo compute đầy đủ</td>
+      <td>Guidance thêm backward; không được gọi matched-compute chỉ vì cùng số ứng viên.</td><td>1 ngày</td>
+    </tr>
+    <tr>
+      <td><strong>6</strong></td>
+      <td>Chưa chứng minh đồng thời contact thấp, khả thi và tiến độ</td>
+      <td>guided_rr_exp có proxy tiếp xúc 4,7% nhưng lệch ngang 1,36 m theo mốc pool-mean. Cần mặt nạ vùng đi được, tiến độ theo goal và comfort/yield; chưa kết luận quỹ đạo vi phạm hành lang.</td>
+      <td>Phụ thuộc nhãn vùng đi được và closed-loop</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="p3a">3a. Bổ sung dữ liệu — kiếm gì trước, ở đâu</h3>
+
+<p>
+  Yêu cầu là: có một đoạn dữ liệu nhiều chuyển động để thử <em>trước khi</em> bỏ công thu thập.
+  Đây là câu trả lời có thứ tự ưu tiên rõ ràng.
+</p>
+
+<h4>Nguyên tắc chọn: cần track, không chỉ cần video</h4>
+
+<p>
+  Một đoạn video đẹp không dùng được. Cái cần là <strong>track ID ổn định theo thời gian trên nhiều
+  giây</strong>, vì toàn bộ pipeline hiện tại ăn vào trạng thái <code>[x, y, vx, vy]</code> và cần
+  tương lai thật để chấm held-out. Nếu tự gắn nhãn từ YouTube, chi phí gắn nhãn lớn hơn chi phí
+  thu thập — và đó chính là thứ cần tránh ở bước này.
+</p>
+
+<h4>Bốn nguồn, xếp theo mức phù hợp cho một lần thử</h4>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr><th style="width:130px">Nguồn</th><th style="width:96px">Có track sẵn</th><th>Vì sao phù hợp / không</th><th style="width:96px">Dùng để</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>SDD</strong><br><span style="font-size:12px;color:#6b7480">Stanford Drone</span></td>
+      <td>Có — <code>annotation.txt</code> với track ID + bounding box + frame</td>
+      <td>
+        Góc nhìn từ trên, 8 cảnh, có <strong>rẽ, đổi tốc độ, nhiều hướng</strong> — đúng thứ đang thiếu.
+        Có sẵn ma trận homography cho từng cảnh trong các repo Social-STGCNN / Trajectron++.
+        Một clip là đủ để thử. Kiểm tra lại điều khoản giấy phép trên trang gốc trước khi dùng cho bài báo.
+      </td>
+      <td><strong>Thử ngay tuần này</strong></td>
+    </tr>
+    <tr>
+      <td><strong>ETH / UCY</strong><br><span style="font-size:12px;color:#6b7480">seq_eth, seq_hotel</span></td>
+      <td>Có — toạ độ thế giới, track ID</td>
+      <td>
+        Là benchmark chuẩn của trajectory forecasting. Dùng nó thì ADE/FDE của mình <strong>so sánh
+        được với literature</strong> — lợi thế lớn khi viết bài. Nhược điểm: độ phân giải thấp, cảnh ít.
+      </td>
+      <td>Để <strong>công bố</strong> số liệu</td>
+    </tr>
+    <tr>
+      <td><strong>JRDB</strong></td>
+      <td>Có — 2D/3D box, track ID, từ robot</td>
+      <td>
+        Góc nhìn robot, đúng điều kiện triển khai nhất. Nhưng cần chiếu 3D→2D và xử lý khung hình
+        chuyển động — nặng hơn nhiều so với một lần thử.
+      </td>
+      <td>Giai đoạn sau</td>
+    </tr>
+    <tr>
+      <td><strong>YouTube</strong></td>
+      <td><strong>Không</strong></td>
+      <td>
+        Không có track. Giấy phép không rõ ràng cho mục đích nghiên cứu. Chỉ dùng được làm
+        <em>hình minh họa định tính</em>, tuyệt đối không dùng làm bằng chứng.
+      </td>
+      <td>Chỉ để làm demo</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="call">
+  <span class="lbl">Trả lời trực tiếp câu hỏi “YouTube hay nguồn nào”</span>
+  <p>
+    Đừng bắt đầu từ YouTube. Bắt đầu từ <strong>một clip SDD</strong> — nó có sẵn track, có sẵn
+    homography, có chuyển động đa hướng, và mất khoảng một ngày để đưa vào pipeline. YouTube chỉ
+    quay lại ở bước cuối, khi cần một đoạn phim minh họa cho slide, và khi đó nó là hình, không phải dữ liệu.
+  </p>
+</div>
+
+<h4>Quy trình một ngày cho clip SDD</h4>
+
+<ol>
+  <li><strong>Lấy một clip.</strong> Chọn một sequence trong scene <code>bookstore</code> hoặc
+    <code>deathCircle</code> — hai scene này có mật độ người và hướng đi đa dạng nhất. Chỉ cần
+    <code>video.mov</code> + <code>annotation.txt</code> + <code>reference.jpg</code>.</li>
+  <li><strong>Đổi pixel sang mét.</strong> Dùng ma trận homography 3×3 có sẵn cho scene đó (trong
+    repo Social-STGCNN). Kiểm tra bằng cách đo một vật thể đã biết kích thước — nếu sai quá 10% thì
+    homography sai scene.</li>
+  <li><strong>Cắt track thành cửa sổ.</strong> Chuẩn hoá về 0.4 s giữa các mẫu, 8 bước quan sát +
+    12 bước dự phóng (3.2 s nhìn, 4.8 s đoán) — đúng protocol ETH/UCY, để so sánh được với literature.</li>
+  <li><strong>Dựng file trạng thái mới</strong> theo đúng schema của <code>states_pf.json</code>,
+    nhưng lấy vận tốc từ <em>chuyển động thật</em> thay vì gán hằng số.</li>
+  <li><strong>Chạy lại script 46 không đổi một dòng.</strong> Đây là điểm mạnh của thiết kế hiện tại:
+    held-out, CI ghép cặp, tham chiếu năng lượng đều đã tách sẵn khỏi dữ liệu.</li>
+  <li><strong>Đo ba thứ</strong> ở phần dưới, rồi mới quyết định thu thêm.</li>
+</ol>
+
+<h4>Ba phép đo quyết định trước khi chi tiền thu thập</h4>
+
+<p>
+  Đây là phần quan trọng nhất của mục 3a. Mỗi phép đo có ngưỡng và có hệ quả rõ ràng.
+</p>
+
+<div class="tw">
+<table>
+  <thead><tr><th style="width:150px">Phép đo</th><th>Cách tính</th><th style="width:130px">Ngưỡng</th><th style="width:150px">Nếu không đạt</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Đa dạng hướng</strong></td>
+      <td>Độ lệch chuẩn góc của 8 tương lai thật tại t = 3 s, trên các track đang di chuyển</td>
+      <td>≥ 5°</td>
+      <td>Cảnh đó cũng thoái hoá như 4/5 điều kiện hiện tại — đổi clip</td>
+    </tr>
+    <tr>
+      <td><strong>Baseline có thể bị đánh bại</strong></td>
+      <td>ADE của vận tốc không đổi so với ADE của một mô hình tuyến tính fit trên 8 bước quan sát</td>
+      <td>Tỉ lệ &gt; 1.15</td>
+      <td>Nếu constant velocity đã gần tối ưu, không còn gì để dự báo — hướng này vô nghĩa</td>
+    </tr>
+    <tr>
+      <td><strong>Có headroom</strong></td>
+      <td>Chạy <code>rr16g</code> nhưng thay tương lai oracle bằng tương lai <em>thật</em>: nếu ngay cả khi biết trước tương lai thật mà tiếp xúc không giảm, thì không phương pháp nào giúp được</td>
+      <td>Giảm ≥ 3 điểm %</td>
+      <td>Kill. Đây là phép thử rẻ nhất và mạnh nhất.</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<div class="call ok">
+  <span class="lbl">Vì sao phép thử thứ ba là phép thử quan trọng nhất</span>
+  <p>
+    Nó không kiểm tra phương pháp — nó kiểm tra <em>bài toán có lời giải không</em>. Nếu được trao
+    tương lai thật mà robot vẫn không né được, thì mọi kiến trúc, mọi forecaster, mọi hàm rủi ro đều
+    vô ích; vấn đề nằm ở không gian hành động hoặc ở proxy đo. Chạy mất một ngày và nó tiết kiệm
+    được nhiều tháng.
+  </p>
+</div>
+
+<h3 id="p3b">3b. Thêm dữ liệu xong thì phương pháp còn ổn không?</h3>
+
+<p>
+  Đây là hai câu hỏi khác nhau, và trộn chúng lại là nguồn gốc của phần lớn tuyên bố sai trong
+  literature. Tôi trả lời riêng.
+</p>
+
+<h4>Câu hỏi 1 — Phương pháp còn đúng về mặt cơ chế không?</h4>
+
+<p>
+  Có, nhưng hiệu ứng sẽ <strong>nhỏ đi</strong>, không lớn lên. Ba lý do, và cả ba đều dự đoán được
+  trước khi chạy — nên có thể kiểm chứng.
+</p>
+
+<ol>
+  <li><strong>Đuôi mỏng đi.</strong> Với forecaster đã hiệu chỉnh, phân phối tương lai sắc hơn nhiều
+    so với nhiễu quanh vận tốc không đổi. Khi đó kỳ vọng và CVaR tiến lại gần nhau, và cả hai tiến
+    gần point forecast. Dự đoán: Δ(exp−pt) → khoảng 0, có thể âm nhẹ.</li>
+  <li><strong>Forecaster tốt làm giảm nhu cầu bảo thủ.</strong> Phần lớn lợi ích của CVaR hiện tại
+    đến từ việc bù cho một mô hình người tồi. Khi mô hình người tốt lên, phần bù đó mất giá trị.</li>
+  <li><strong>Chi phí vẫn còn.</strong> Góc quay và lệch ngang — cái giá của sự bảo thủ — không giảm
+    theo chất lượng forecaster. Nên tỉ lệ lợi ích/chi phí xấu đi.</li>
+</ol>
+
+<div class="call warn">
+  <span class="lbl">Dự đoán có thể sai — và đó là điểm tốt</span>
+  <p>
+    Nếu dữ liệu thật cho thấy Δ(exp−pt) trở nên <em>dương và lớn</em>, thì giả thuyết “đuôi mỏng đi”
+    sai, và đó là một kết quả thú vị hơn nhiều — nghĩa là bất định chuyển động của người thật có cấu
+    trúc đuôi nặng mà nhiễu Gauss không bắt được. Cả hai kết cục đều đăng được. Điều không đăng được
+    là không đo.
+  </p>
+</div>
+
+<h4>Câu hỏi 2 — Có tốt hơn SocialNav cũ không?</h4>
+
+<p>
+  <strong>Hiện tại: không thể trả lời, và không được phép tuyên bố.</strong> Ba lý do cụ thể:
+</p>
+
+<ul>
+  <li><strong>Khác thang đo.</strong> DCR/RC của họ là tỉ lệ tuân thủ vùng <em>có điều kiện thành công</em> —
+    episode thất bại thì tính 0. Chúng tôi đo proxy hình học 0.45 m. Hai đại lượng khác thang, khác
+    điều kiện tính, không suy ra nhau được.</li>
+  <li><strong>Khác chế độ.</strong> Họ closed-loop; chúng tôi open-loop. Trong open-loop, người không
+    né robot — nên bài toán dễ hơn về mặt tương tác nhưng cũng khác về bản chất.</li>
+  <li><strong>Không chạy được closed-loop.</strong> Đây là blocker môi trường, không phải lựa chọn.</li>
+</ul>
+
+<p>
+  Điều <em>có thể</em> nói, và nói được mạnh: SocialNav tối ưu kỳ vọng; phần đuôi của phân phối
+  tương lai người không xuất hiện trong mục tiêu huấn luyện của họ. Đây là một quan sát về mục tiêu,
+  kiểm chứng được bằng cách đọc mục tiêu, không cần chạy lại benchmark của họ. Đó là loại tuyên bố
+  đứng vững trước hội đồng — và nó cũng là loại tuyên bố hẹp hơn nhiều so với “tốt hơn”.
+</p>
+
+<div class="tw">
+<table>
+  <thead><tr><th style="width:270px">Tuyên bố</th><th style="width:110px">Trạng thái</th><th>Điều kiện để đứng vững</th></tr></thead>
+  <tbody>
+    <tr><td>“Tối ưu đuôi là một khoảng trống trong SocialNav”</td><td style="color:#1a6b45"><strong>Đứng được</strong></td><td>Không cần gì thêm — đọc mục tiêu huấn luyện là đủ</td></tr>
+    <tr><td>“Lớp rủi ro tường minh khả thi về mặt cơ chế”</td><td style="color:#1a6b45"><strong>Đứng được</strong></td><td>Đã có: 66.5% → 14.8% (script 41, in-sample) và 30.3% → 4.7% (script 48, held-out, đối chứng cùng giao thức)</td></tr>
+    <tr><td>“Thấy người nhưng không tránh là lỗi hệ thống của pipeline hiện tại”</td><td style="color:#8a5a10"><strong>Có điều kiện</strong></td><td>Cần chạy trên ≥2 checkpoint độc lập</td></tr>
+    <tr><td>“Phân phối giúp robot an toàn hơn”</td><td style="color:#8f2020"><strong>Không đứng được</strong></td><td>Bị phản chứng bởi script 46</td></tr>
+    <tr><td>“Tốt hơn SocialNav”</td><td style="color:#8f2020"><strong>Không đứng được</strong></td><td>Cần closed-loop + chỉ số của họ</td></tr>
+  </tbody>
+</table>
+</div>
+
+<!-- ================================================================= -->
+<h2 id="p4"><span class="num">Phần 4</span>Go hay No-Go</h2>
+
+<div class="stats">
+  <div class="stat"><span class="v bad">NO-GO</span><span class="k">cho tuyên bố “an toàn hơn” hay “đề xuất đạt 4,7%”</span></div>
+  <div class="stat"><span class="v ok">GO</span><span class="k">cho bước dữ liệu, có điều kiện</span></div>
+  <div class="stat"><span class="v">1–2</span><span class="k">tuần để có câu trả lời dứt khoát</span></div>
+  <div class="stat"><span class="v bad">3 tuần</span><span class="k">hạn chót cho cổng closed-loop</span></div>
+</div>
+
+<div class="verdict-box" style="border-left:5px solid #8f2020;background:#fdf5f5">
+  <span class="tag nogo">Cập nhật sau script 48</span>
+  <p style="margin-bottom:10px">
+    Script 48 chứng minh guidance có giá trị lớn về tiếp xúc (−25,58 điểm phần trăm trên
+    <code>il3_s0</code>, CI [−27,30, −23,90]) <strong>khi so với chính baseline rerank cùng ngân sách</strong>.
+    Đây là kết quả tốt hơn nhiều so với những gì tài liệu này dự đoán trước đó. Nhưng nó không phải
+    phương pháp mới, và nó giảm proxy tiếp xúc đồng thời tăng lệch ngang gấp đôi.
+  </p>
+  <p style="margin-bottom:0">
+    Vì vậy trạng thái đúng là: <strong>GO</strong> cho một pha phương pháp <em>bị ràng buộc bởi tính khả
+    thi và năng suất</em>; <strong>NO-GO</strong> cho bất kỳ câu nào dạng “phương pháp đề xuất của chúng tôi
+    đạt 4,7% tiếp xúc”, “an toàn hơn SocialNav”, hay “vượt baseline nhờ mô hình hóa phân phối”.
+  </p>
+</div>
+
+<h3>4.1 Ba cổng, theo thứ tự bắt buộc</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th style="width:44px">Cổng</th><th style="width:200px">Nội dung</th><th style="width:120px">Thời gian</th><th>Tiêu chí đạt</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>G1</strong></td>
+      <td>Một clip dữ liệu thật + ba phép đo ở mục 3a</td>
+      <td>3–5 ngày</td>
+      <td>Đa dạng hướng ≥ 5° <em>và</em> baseline bị đánh bại <em>và</em> headroom ≥ 3 điểm % <em>và</em> đánh bại <code>guided_rr_exp</code> trên cả tiếp xúc lẫn khả thi</td>
+    </tr>
+    <tr>
+      <td><strong>G2</strong></td>
+      <td>Forecaster thật, huấn luyện trên track người thật, chấm bằng ADE/FDE chuẩn</td>
+      <td>1–2 tuần</td>
+      <td>ADE thấp hơn constant velocity có ý nghĩa; calibration đo được (PICP gần mức danh nghĩa)</td>
+    </tr>
+    <tr>
+      <td><strong>G3</strong></td>
+      <td>Closed-loop trên CityWalker với chỉ số của SocialNav</td>
+      <td>Không xác định — <strong>bị chặn</strong></td>
+      <td>Render server chạy được; SR/RC/SPL đo được trên ≥9 cảnh</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>
+  G1 là cổng rẻ nhất và quyết định nhiều nhất. Nếu G1 trượt, dừng — không cần G2. Nếu G1 đạt mà G2
+  trượt, vấn đề nằm ở mô hình hóa người, không ở ý tưởng. Nếu G1 và G2 đạt mà G3 vẫn chặn sau ba tuần,
+  chuyển sang hướng báo cáo chẩn đoán.
+</p>
+
+<div class="call">
+  <span class="lbl">Điều kiện bổ sung bắt buộc từ script 48</span>
+  <p>
+    G1 giờ phải được chấm <strong>so với <code>guided_rr_exp</code> và <code>guided_rr_pt</code></strong>,
+    không phải so với rerank không guidance. Lý do: trên tập tổng hợp, guidance đã đưa tiếp xúc xuống
+    4,7% — nếu trên dữ liệu thật mà phương pháp mới chỉ ngang mức đó thì nó <em>không thêm gì</em>.
+    Tiêu chí phải là: tiếp xúc thấp hơn <em>hoặc</em> bằng, <strong>và</strong> lệch ngang / góc quay /
+    tiến độ tốt hơn rõ rệt. Chỉ một trong hai thì không đủ.
+  </p>
+</div>
+
+<h3>4.2 Hai kết cục, cả hai đều dùng được</h3>
+
+<div class="verdict-box">
+  <span class="tag go">Nếu G1 và G2 đạt</span>
+  <p style="margin-bottom:10px">
+    Bài báo có dạng <em>method + analysis</em>: một lớp rủi ro tường minh, kèm đường cong chi phí
+    của sự bảo thủ, kèm hai phát hiện về giới hạn của nó — chọn theo kỳ vọng không thắng trên prior
+    chính (46), và guidance mua tiếp xúc thấp bằng lệch ngang (48).
+    Đóng góp thực chất là <strong>định lượng được cái giá của an toàn</strong> — thứ mà các bài
+    social navigation hiện tại không báo cáo.
+  </p>
+  <p style="margin-bottom:0">
+    Tuyên bố trung tâm nên là: “chúng tôi định lượng được đánh đổi giữa rủi ro đuôi và tính hợp lý
+    của quỹ đạo, và chỉ ra rằng lợi ích của việc mô hình hóa phân phối phụ thuộc vào chất lượng
+    forecaster theo một cách định lượng được”. Đây là tuyên bố hẹp, kiểm chứng được bằng cách đọc
+    mục tiêu, và ít bị phản bác hơn nhiều so với “tốt hơn”.
+  </p>
+</div>
+
+<div class="verdict-box">
+  <span class="tag nogo">Nếu G1 trượt</span>
+  <p style="margin-bottom:10px">
+    Kết quả âm vẫn có giá trị, và có thể viết thành một mục “negative result” trong bài lớn hơn:
+    chỉ ra rằng trên dữ liệu chuyển động thật, headroom cho việc chọn mẫu là không đủ để biện minh
+    cho chi phí của một lớp rủi ro tường minh. Đây là thông tin hữu ích cho cộng đồng và trung thực.
+  </p>
+  <p style="margin-bottom:0">
+    Khi đó nên chuyển trọng tâm sang chẩn đoán “thấy người nhưng không tránh” — đã có dữ liệu:
+    trên CityWalker, tiếp xúc ở static 2 m là 93% so với 92% khi không có người; head-on 3 m là
+    99.5% so với 98%. Đây là một phát hiện tiêu cực mạnh và độc lập với toàn bộ hướng diffusion.
+  </p>
+</div>
+
+<h3>4.3 Kết luận một đoạn</h3>
+
+<div class="call">
+  <span class="lbl">Tóm tắt để quyết định</span>
+  <p>
+    Script 46 không hỗ trợ lợi ích của chọn theo kỳ vọng trên prior chính: 30,3% so với 29,1% của point.
+    Script 48 bổ sung kết quả quan trọng hơn: guidance + rerank giảm proxy tiếp xúc xuống 4,7%,
+    nhưng lệch ngang tăng từ 0,66 lên 1,36 m. Đây là <strong>sửa đối chứng, chưa phải phương pháp mới</strong>.
+    GO cho bước thiết kế ràng buộc khả thi/yield, so với cả guided_rr_pt và guided_rr_exp;
+    tiếp theo cần chuyển động thật và closed-loop. NO-GO cho tuyên bố “vượt SocialNav” hoặc
+    “đã có phương pháp social navigation an toàn hơn”. Chưa xác định nguyên nhân đầy đủ của
+    sự đảo dấu ở 46; không quy nguyên nhân duy nhất cho phân phối tổng hợp.
+  </p>
+</div>
+
+<!-- ================================================================= -->
+<h2 id="p5"><span class="num">Phụ lục</span>Bảng số đầy đủ và nguồn</h2>
+
+<h3>A. Script 43 — baseline trong ngân sách 16 mẫu</h3>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>policy</th><th>điều kiện</th><th class="num">ung</th><th class="num">gui</th><th class="num">rr16</th><th class="num">rr16g</th><th class="num">turn ° ung/rr/gui</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>published</td><td>headon_3m</td><td class="num">100.0</td><td class="num">95.2</td><td class="num">100.0</td><td class="num">71.6</td><td class="num">2.3 / 6.9 / 10.2</td></tr>
+    <tr><td>published</td><td>static_2m</td><td class="num">95.1</td><td class="num">89.3</td><td class="num">84.5†</td><td class="num">50.0</td><td class="num">2.4 / 9.9 / 9.1</td></tr>
+    <tr><td>published</td><td>static_3m</td><td class="num">90.1</td><td class="num">62.8</td><td class="num">49.7</td><td class="num"><strong>0.8</strong></td><td class="num">2.3 / 13.0 / 22.2</td></tr>
+    <tr><td>il3_s0</td><td>headon_3m</td><td class="num">66.5</td><td class="num">14.8</td><td class="num">35.5</td><td class="num"><strong>0.0</strong></td><td class="num">8.1 / 16.8 / 29.8</td></tr>
+    <tr><td>il3_s0</td><td>static_2m</td><td class="num">48.1</td><td class="num">5.9</td><td class="num">11.3</td><td class="num">0.0</td><td class="num">7.8 / 15.5 / 24.1</td></tr>
+    <tr><td>il3_s1</td><td>headon_3m</td><td class="num">36.8</td><td class="num">4.2</td><td class="num">5.0</td><td class="num">0.0</td><td class="num">13.7 / 27.6 / 33.4</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="tcap">
+  † CI không chứa điểm ước lượng: script 43 bootstrap trung bình đều theo người nhưng điểm ước lượng
+  là trung bình toàn bộ trạng thái, và mỗi người có 1–2 trạng thái. Lỗi estimand này được sửa ở 46.
+  <br>
+  <code>rr16g = 0.0</code> là upper bound có lợi thế oracle — guidance được trao đúng tương lai vận tốc
+  không đổi. Không phải con số triển khai được.
+</p>
+
+<h3>B. Script 46 — bảng đầy đủ</h3>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>policy</th><th>điều kiện</th><th class="num">ins exp</th><th class="num">ins pt</th><th class="num">hel exp</th><th class="num">hel pt</th><th class="num">Δ exp−pt</th><th class="num">Δ cvar−pt</th><th class="num">Δ gui−pt</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>il3_s0</td><td>headon_3m</td><td class="num">25.3</td><td class="num">28.9</td><td class="num"><strong>30.3</strong></td><td class="num"><strong>29.1</strong></td><td class="num"><strong>+1.2</strong></td><td class="num"><strong>+2.6</strong></td><td class="num">−1.9</td></tr>
+    <tr><td>published</td><td>headon_3m</td><td class="num">61.1</td><td class="num">68.9</td><td class="num">66.1</td><td class="num">70.3</td><td class="num"><strong>−4.2</strong></td><td class="num">−2.8</td><td class="num"><strong>−8.2</strong></td></tr>
+    <tr><td>published</td><td>static_2m</td><td class="num">84.5</td><td class="num">84.5</td><td class="num">84.5</td><td class="num">84.5</td><td class="num">0.0</td><td class="num">0.0</td><td class="num">+6.1</td></tr>
+    <tr><td>published</td><td>static_3m</td><td class="num">49.7</td><td class="num">49.7</td><td class="num">49.7</td><td class="num">49.7</td><td class="num">0.0</td><td class="num">0.0</td><td class="num">−10.8</td></tr>
+    <tr><td>il3_s0</td><td>left/right/static</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">—</td><td class="num">0.0</td><td class="num">0.0</td><td class="num">≈ 0</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="tcap">
+  CI bootstrap ghép cặp theo sprite, có điều kiện trên các cửa sổ cố định; riêng head-on có 306 sprite / 380 trạng thái, không phải 338 người độc lập. Bốn điều kiện cuối có
+  <code>ins ≡ hel</code> tuyệt đối vì vận tốc bằng không nên mọi tương lai trùng nhau.
+</p>
+
+<h3>B2. Script 48 — bảng đầy đủ và đánh đổi hình học</h3>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr><th>policy</th><th class="num">ung</th><th class="num">pt</th><th class="num">exp</th><th class="num">cvar</th><th class="num">gui</th><th class="num">rr_pt</th><th class="num">rr_exp</th><th class="num">rr_cvar</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>published · headon_3m</td><td class="num">74.1</td><td class="num">70.3</td><td class="num">66.1</td><td class="num">67.5</td><td class="num">62.1</td><td class="num">45.8</td><td class="num"><strong>47.1</strong></td><td class="num">49.1</td></tr>
+    <tr><td>il3_s0 · headon_3m</td><td class="num">53.4</td><td class="num">29.1</td><td class="num">30.3</td><td class="num">31.7</td><td class="num">27.2</td><td class="num">4.3</td><td class="num"><strong>4.7</strong></td><td class="num">3.6</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="tcap">
+  Tỷ lệ tiếp xúc được lấy trung bình trên các cặp trạng thái–tương lai held-out (32 tương lai/trạng thái),
+  không phải tỷ lệ trạng thái có tiếp xúc với ít nhất một tương lai.
+  380 trạng thái head-on, 306 sprite, 19 cửa sổ. <code>rr_*</code> = guided rerank.
+</p>
+
+<div class="tw">
+<table>
+  <thead>
+    <tr><th style="width:330px">Đại lượng (il3_s0)</th><th class="num">exp</th><th class="num">gui</th><th class="num">rr_exp</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>Lệch ngang tối đa vs tham chiếu pool-mean, TB (m)</td><td class="num">0.66</td><td class="num">0.81</td><td class="num"><strong>1.36</strong></td></tr>
+    <tr><td>% trạng thái lệch ngang &gt; 1 m</td><td class="num">10.8%</td><td class="num">23.7%</td><td class="num"><strong>91.6%</strong></td></tr>
+    <tr><td>Góc quay tối đa tính cả gốc (°)</td><td class="num">18.8</td><td class="num">23.0</td><td class="num"><strong>34.0</strong></td></tr>
+    <tr><td>Tỉ lệ chuẩn điểm cuối vs driver</td><td class="num">0.919</td><td class="num">1.046</td><td class="num">0.945</td></tr>
+    <tr><td>% trạng thái không tiếp xúc với cả 32 tương lai</td><td class="num">9.7%</td><td class="num">11.6%</td><td class="num"><strong>49.7%</strong></td></tr>
+  </tbody>
+</table>
+</div>
+<p class="tcap">
+  Lưu ý hai tham chiếu khác nhau: bảng này dùng trung bình pool chưa guidance làm mốc chung; hàm
+  <code>energy_single</code> dùng bản chưa guidance của chính ứng viên. Không suy ra vi phạm hành lang
+  từ 91,6%. Tỉ lệ chuẩn điểm cuối không phải tiến độ — 48 không lưu độ dài đường đi hay tỉ lệ thành công.
+</p>
+
+<h3>C. Hằng số của hệ thống</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th style="width:150px">Hằng số</th><th class="num" style="width:110px">Giá trị</th><th>Ý nghĩa</th></tr></thead>
+  <tbody>
+    <tr><td><code>CONTACT</code></td><td class="num">0.45 m</td><td>Ngưỡng bán kính tính là tiếp xúc</td></tr>
+    <tr><td><code>COMFORT</code></td><td class="num">1.20 m</td><td>Khoảng cách thoải mái kỳ vọng</td></tr>
+    <tr><td><code>R_GUIDE</code></td><td class="num">1.2 m</td><td>Bán kính vùng ảnh hưởng khi guidance</td></tr>
+    <tr><td><code>STEPS</code></td><td class="num">5</td><td>Số bước flow khi sinh</td></tr>
+    <tr><td><code>NCAND</code></td><td class="num">16</td><td>Số ứng viên mỗi trạng thái</td></tr>
+    <tr><td><code>N_FUTURES</code></td><td class="num">8</td><td>Số tương lai người trong ngân sách chọn</td></tr>
+    <tr><td>Chân trời</td><td class="num">5 s</td><td><code>linspace(0, 5, 51)</code></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>D. Thuật ngữ</h3>
+
+<div class="tw">
+<table>
+  <thead><tr><th style="width:180px">Thuật ngữ</th><th>Nghĩa trong tài liệu này</th></tr></thead>
+  <tbody>
+    <tr><td><strong>in-sample</strong></td><td>Bộ chọn được nhìn thấy chính tương lai dùng để chấm. Đo khả năng phản ứng, không đo giá trị thông tin.</td></tr>
+    <tr><td><strong>held-out</strong></td><td>Bộ chọn không được nhìn thấy tương lai dùng để chấm. Đây là con số dùng để tuyên bố.</td></tr>
+    <tr><td><strong>headroom</strong></td><td>Mức cải thiện tối đa có thể đạt nếu biết trước tương lai thật. Nếu headroom nhỏ, không phương pháp nào giúp được.</td></tr>
+    <tr><td><strong>CVaR</strong></td><td>Trung bình của phần đuôi xấu nhất của phân phối. Ở đây là trung bình năng lượng của nửa xấu nhất trong 8 tương lai.</td></tr>
+    <tr><td><strong>PICP</strong></td><td>Tỉ lệ quan sát thật rơi vào khoảng dự báo. Thước đo calibration của một forecaster xác suất.</td></tr>
+    <tr><td><strong>proxy tiếp xúc</strong></td><td>Chỉ báo khoảng cách nhỏ nhất &lt; 0.45 m theo một cặp quỹ đạo robot–người. Với held-out, lấy trung bình chỉ báo trên trạng thái × 32 tương lai. Không phải tỷ lệ va chạm thực hoặc tỷ lệ trạng thái tiếp xúc với bất kỳ tương lai nào.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>E. Nguồn</h3>
+
+<ul style="font-size:14px">
+  <li>SocialNav — arXiv <code>2511.21135v2</code>, giấy phép CC BY 4.0. MAOE 7.8° là số của bài báo; 9.2° là bản sao của chúng tôi.</li>
+  <li>Stanford Drone Dataset — Robicquet et al., ECCV 2016. Giấy phép CC BY-SA 3.0. Bản gốc tại <code>cvgl.stanford.edu</code>; bản sao ổn định trên Kaggle.</li>
+  <li>ETH / UCY — benchmark chuẩn của trajectory forecasting; protocol 8 quan sát / 12 dự phóng, 0.4 s.</li>
+  <li>JRDB — <code>jrdb.erc.monash.edu</code>; JRDB-Pose (CVPR 2023) bổ sung pose và track ID.</li>
+  <li>Dữ liệu nội bộ: <code>results_41_pf.json</code>, <code>results_43_rerank.json</code>,
+    <code>results_44_uncertainty.json</code>, <code>results_46_heldout.json</code>,
+    <code>results_47b_diversity.json</code>, <code>results_48_guided_rerank.json</code>
+    (kèm <code>raw_48_guided_rerank.npz</code> và <code>manifest_48_guided_rerank.json</code>).
+    <code>results_45_heldout.json</code> <strong>không dùng</strong> — lỗi thiết kế, đã bị thay thế.
+    <code>results_47*</code> (bản gốc của 47) <strong>không dùng</strong> cho bất kỳ tuyên bố nào — là
+    counterfactual oracle-velocity, không phải bằng chứng nhận thức hay chuyển động.</li>
+</ul>
+
+<footer>
+  <p>
+    <strong>Trạng thái bằng chứng:</strong> toàn bộ số liệu là open-loop, trên tương lai người tổng hợp,
+    với trạng thái người lấy chính xác từ metadata. Đây là kiểm toán lập kế hoạch, không phải đánh giá
+    một hệ thống đã triển khai.
+  </p>
+  <p>
+    Tài liệu này thay thế các bản tóm tắt trước đó ở phần kết luận. Hai báo cáo HTML
+    (<code>report_technical_detail</code> và <code>report_presentation_council</code>) vẫn là nguồn
+    chi tiết cho phần phương pháp và phần trình bày hội đồng; bản này là tài liệu đọc liền mạch.
+  </p>
+</footer>
+
+</div>
+</body>
+</html>
